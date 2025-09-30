@@ -1,0 +1,196 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: #fefefe;
+    color: #1c1c1c;
+}
+
+/* Navbar */
+header {
+    background: #ffffff;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 10%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #00695c;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+}
+
+nav ul li a:hover {
+    color: #00695c;
+}
+
+.icons {
+    display: flex;
+    gap: 15px;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+/* Hero Section */
+.hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 60px 10%;
+    background: #f6f9f8;
+}
+
+.hero-text {
+    max-width: 50%;
+}
+
+.hero-text h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #093028;
+}
+
+.hero-text p {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    color: #555;
+}
+
+.hero-text button {
+    background: #00695c;
+    color: #fff;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.hero-text button:hover {
+    background: #004d40;
+}
+
+.hero img {
+    max-width: 40%;
+    border-radius: 8px;
+}
+
+/* Categories */
+.categories {
+    padding: 60px 10%;
+    text-align: center;
+}
+
+.categories h2 {
+    font-size: 2rem;
+    margin-bottom: 40px;
+    color: #093028;
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+.category-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+}
+
+.category-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+}
+
+.category-card span {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    background: rgba(0, 105, 92, 0.85);
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+/* Footer */
+footer {
+    background: #093028;
+    color: #fff;
+    padding: 40px 10%;
+    margin-top: 60px;
+}
+
+footer .footer-content {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+footer .footer-content div {
+    flex: 1;
+    margin: 10px;
+    min-width: 200px;
+}
+
+footer h3 {
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+footer ul {
+    list-style: none;
+}
+
+footer ul li {
+    margin-bottom: 8px;
+}
+
+footer ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+footer ul li a:hover {
+    text-decoration: underline;
+}
+
+footer p {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
