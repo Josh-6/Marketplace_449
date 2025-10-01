@@ -21,22 +21,17 @@ Only need to install these components:
 - phpMyAdmin
 
 3. Find htdocs in XAMPP folder
-  ```bash
-  Windows → C:\xampp\htdocs\
+- Windows → C:\xampp\htdocs\
+- Mac → /Applications/XAMPP/htdocs/
+- Linux → /opt/lampp/htdocs/
   
-  Mac → /Applications/XAMPP/htdocs/
-  
-  Linux → /opt/lampp/htdocs/
-  ```
 4. Move or copy Marketplace_449 to htdocs
-  ```bash
-  Windows → C:\xampp\htdocs\Marketplace_449
+- Windows → C:\xampp\htdocs\Marketplace_449
+- Mac → /Applications/XAMPP/htdocs/Marketplace_449
+- Linux → /opt/lampp/htdocs/Marketplace_449
   
-  Mac → /Applications/XAMPP/htdocs/Marketplace_449
-  
-  Linux → /opt/lampp/htdocs/Marketplace_449
-  ```
-5. Go to your browser and visit: [http://localhost/marketplace_449/frontend/](http://localhost/marketplace_449/frontend/)
+5. Go to your browser and visit
+    [http://localhost/marketplace_449/frontend/](http://localhost/marketplace_449/frontend/)
 
 
 
