@@ -31,7 +31,9 @@ Only need to install these components:
 - Linux → /opt/lampp/htdocs/Marketplace_449
   
 5. Go to your browser and visit
-    [http://localhost/marketplace_449/frontend/](http://localhost/marketplace_449/frontend/)
+  ```bash
+  http://localhost/marketplace_449/frontend/
+  ```
 
 
 
