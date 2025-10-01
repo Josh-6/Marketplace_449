@@ -1,2 +1,4 @@
 # Marketplace_449
-WIll be working on getting a working sign in sheet
+Download XAMPP
+Only need to install these components: Apache, MySQL, PHP, and phpMyAdmin
+
