@@ -33,8 +33,19 @@ Only need to install these components:
 - Windows → C:\xampp\htdocs\Marketplace_449
 - Mac → /Applications/XAMPP/htdocs/Marketplace_449
 - Linux → /opt/lampp/htdocs/Marketplace_449
+
+6. Using XAMPP App
+- start the "Apache" module
+- start the "MySQL" Module
+
+7. Using any mySQL DBMS
+- create a connection
+- 
+- copy the XAMPP port and add it on the set up option "Port"
+- set a password if needed
+- Optional - set a devide as a server so that it can be accessible by different collaborators. Needs to have further configuration...
   
-6. Go to your browser and visit
+7. Go to your browser and visit
   ```bash
   http://localhost/marketplace_449/frontend/
   ```
