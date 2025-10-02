@@ -40,12 +40,21 @@ Only need to install these components:
 
 7. Using any mySQL DBMS
 - create a connection
-- 
 - copy the XAMPP port and add it on the set up option "Port"
 - set a password if needed
 - Optional - set a devide as a server so that it can be accessible by different collaborators. Needs to have further configuration...
-  
-7. Go to your browser and visit
+
+8. Go to your browser and visit
+- (only the first time)
+  ```bash
+  http://localhost/marketplace_449/database/
+  ```
+  and choose either
+  - appDBSetup option to set up the Models and populate with dummy data
+  - DBbuildModel for just the model
+  - sampleData to populate the schema with data
+
+- Or if already set up go directly to:
   ```bash
   http://localhost/marketplace_449/frontend/
   ```
