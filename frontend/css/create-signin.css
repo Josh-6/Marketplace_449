@@ -1,0 +1,95 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+/* change background image later*/
+.form-background {
+    min-height: 100vh;
+    width: 100%;
+    background-image: linear-gradient(rgba(4, 9, 30, 0.7), rgba(4, 9, 30, 0.7));/*, url(../images/);*/
+    background-position: center;
+    background-size: cover;
+    position: relative;
+
+    /* Flexbox properties */
+    display: flex;
+    /* Use flex to center child elements */
+    justify-content: center;
+    /* Center horizontally */
+    align-items: center;
+    /* Center vertically */
+}
+
+
+/* The popup form - hidden by default */
+.form-popup {
+    /*display: block;*/
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+    border: 3px solid #070606;
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+/* Form container styling */
+.form-container {
+    padding: 10px;
+}
+
+/* A way to see passwords entered */
+.form-container .reveal-password {
+    margin: 10px 0;
+    font-size: 14px;
+    color: black;
+}
+
+.form-container h2 {
+    color: black;
+}
+
+.form-container label {
+    color: black;
+}
+
+.form-container input:invalid{
+    border: 2px red;
+}
+
+/* Full-width input fields */
+.form-container input[type=text], 
+.form-container input[type=password] {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+/* Buttons */
+.form-container .btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px 20px;
+    cursor: pointer;
+    width: 100%;
+    margin: 10px 0;
+}
+
+.form-container .btn:hover {
+    border: 1px solid #4CAF50;
+    background: #4CAF50;
+    transition: 1s;
+}
+
+.form-container .cancel {
+    background-color: red;
+}
+
+.form-container .cancel:hover {
+    border: 1px solid red;
+    background: red;
+    transition: 1s;
+}
