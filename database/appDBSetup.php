@@ -1,7 +1,7 @@
 <?php
 try {
     require_once __DIR__."/DBsetup.php";
-    require_once __DIR__."/sampleData.php";    // not done yet
+    require_once __DIR__."/sampleData.php";
 } catch (mysqli_sql_exception $e) {
     echo "Error: " . $e->getMessage();
 }
