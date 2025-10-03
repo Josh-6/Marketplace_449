@@ -1,3 +1,6 @@
+<?php
+// index.php
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Marketplace - eCommerce Home Page</title>
   <!-- Correct CSS path -->
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css?v=1" /><!-- If stylesheet changes notrelected increment number -->
 </head>
 <body>
 
@@ -14,12 +17,20 @@
     <div class="logo">Marketplace</div>
     <nav>
       <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="product.html">Products</a></li>
+        <li><a href="index.php">Home</a></li>
+        <li><a href="product.php">Products</a></li>
         <li><a href="#">Categories</a></li>
         <li><a href="#">About</a></li>
         <li><a href="#">Contact Us</a></li>
-      </ul>
+        <li class="dropdown">
+          <a href="#">Hello, Sign in</a>
+          <div class="dropdown-menu">
+            <a href="#">Profile</a>
+            <a href="#">History</a>
+            <a href="#">Orders</a> 
+          </div>
+        </li> 
+    </ul>
     </nav>
     <div class="icons">
       🔍 🛒
@@ -97,5 +108,6 @@
 
   <!-- JS file -->
   <script src="js/app.js"></script>
+  <script src="js/index.js"></script> 
 </body>
 </html>

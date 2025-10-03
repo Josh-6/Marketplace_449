@@ -10,6 +10,7 @@ body {
     color: #1c1c1c;
 }
 
+
 /* Navbar */
 header {
     background: #ffffff;
@@ -51,6 +52,63 @@ nav ul li a:hover {
     font-size: 1.2rem;
     cursor: pointer;
 }
+
+/* Dropdown container */
+.dropdown {
+    position: relative; /* so child is positioned relative to this li */
+}
+
+/* Full-width overlay dropdown */
+.dropdown-box {
+    position: fixed;       /* overlays entire viewport */
+    top: 60px;             /* adjust based on navbar height */
+    left: 0;
+    width: 100vw;          /* full viewport width */
+    background: yellow;
+    display: none;         /* hidden by default */
+    padding: 15px 0;
+    z-index: 9999;         /* overlays everything */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Dropdown container */
+.dropdown {
+    position: relative;
+}
+
+/* The dropdown box */
+.dropdown-menu {
+    position: absolute;
+    top: 108%;           /* directly below the menu item */
+    left: 0;
+    width: 7vw;        /* full viewport width */
+    background: yellow;
+    z-index: 999;
+    display: none;       /* hidden by default */
+    padding: 10px 0;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Show dropdown on hover */
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+/* Style links inside the dropdown */
+.dropdown-menu a {
+    display: block;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+}
+
+/* Hover effect for links */
+.dropdown-menu a:hover {
+    background: #ffd700;  /* slightly darker yellow */
+    color: #000;
+}
+
 
 /* Hero Section */
 .hero {
