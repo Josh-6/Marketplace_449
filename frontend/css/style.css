@@ -82,9 +82,9 @@ nav ul li a:hover {
     top: 108%;           /* directly below the menu item */
     left: 0;
     width: 7vw;        /* full viewport width */
-    background: yellow;
+    background: yellow; /* change to niceer color later */
     z-index: 999;
-    display: none;       /* hidden by default */
+    display: none;       
     padding: 10px 0;
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
