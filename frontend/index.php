@@ -1,9 +1,20 @@
 <?php
-session_start();
-// Example: for testing, uncomment the next line to simulate a logged-in user
-// $_SESSION['username'] = "Alejandro";
-// $_SESSION['username'] = "Josh";
-// $_SESSION['username'] = "Tony";
+// index.php
+// Load configuration settings
+$servername = "localhost";
+$username = "root";
+$password = "";
+
+$conn = new mysqli($servername, $username, $password);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+//check session for user login status
+// session_start();
+
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -11,7 +22,8 @@ session_start();
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Marketplace - eCommerce Home Page</title>
-  <link rel="stylesheet" href="css/style.css?v=1" />
+  <!-- Correct CSS path -->
+  <link rel="stylesheet" href="css/style.css?v=1" /><!-- If stylesheet changes notrelected increment number -->
 </head>
 <body>
 
@@ -26,22 +38,14 @@ session_start();
         <li><a href="#">About</a></li>
         <li><a href="#">Contact Us</a></li>
         <li class="dropdown">
-          <?php if (isset($_SESSION['username'])): ?>
-            <a href="#">Hello, <?php echo htmlspecialchars($_SESSION['username']); ?></a>
-            <div class="dropdown-menu">
-              <a href="#">Profile</a>
-              <a href="#">History</a>
-              <a href="#">Orders</a>
-              <a href="logout.php">Sign Out</a>
-            </div>
-          <?php else: ?>
-            <a href="signin.php">Hello, Sign in</a>
-            <div class="dropdown-menu">
-              <a href="createacc.php">Create Account</a>
-            </div>
-          <?php endif; ?>
+          <a href="signin.php">Hello, Sign in</a>
+          <div class="dropdown-menu">
+            <a href="#">Profile</a>
+            <a href="#">History</a>
+            <a href="#">Orders</a> 
+          </div>
         </li> 
-      </ul>
+    </ul>
     </nav>
     <div class="icons">
       🔍 🛒
@@ -51,28 +55,16 @@ session_start();
   <!-- Hero Section -->
   <section class="hero">
     <div class="hero-text">
-      <?php if (isset($_SESSION['username'])): ?>
-        <h1>Welcome back, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
-        <p>Here are some recommendations for you.</p>
-        <button>Shop Now</button>
-      <?php else: ?>
-        <h1>Exclusive Deals</h1>
-        <p>Explore different categories. Find the best deals.</p>
-        <button>Shop Now</button>
-      <?php endif; ?>
+      <h1>Exclusive Deals</h1>
+      <p>Explore different categories. Find the best deals.</p>
+      <button>Shop Now</button>
     </div>
     <img src="images/hero_image.jpg" alt="Hero Image">
   </section>
 
   <!-- Categories Section -->
   <section class="categories">
-    <h2>
-      <?php if (isset($_SESSION['username'])): ?>
-        Recommended for You
-      <?php else: ?>
-        Explore by Category
-      <?php endif; ?>
-    </h2>
+    <h2>Explore by Category</h2>
     <div class="category-grid">
       <div class="category-card">
         <img src="images/electronics.jpg" alt="Electronics">
@@ -100,6 +92,31 @@ session_start();
       </div>
     </div>
   </section>
+  <section>
+
+    <h2>Featured Products</h2>
+    <div class="product-grid" id="product-grid">
+      <!-- Products will be loaded here In the mean time later on we can use js to load more products-->
+      <?php
+        $query = "SELECT Item_ID, Item_Name, Item_Description, Item_Price, Item_Tags, Item_Quantity FROM Marketplace.Item LIMIT 6";
+        $result = mysqli_query($conn, $query);
+        if ($result) {
+            while ($row = mysqli_fetch_assoc($result)) {
+                echo '<div class="product-card">';
+                echo '<img src="images/product_placeholder.png" alt="' . htmlspecialchars($row['Item_Name']) . ' image">'; // Placeholder image
+                echo '<h3>' . htmlspecialchars($row['Item_Name']) . '</h3>';
+                echo '<p>' . htmlspecialchars($row['Item_Description']) . '</p>';
+                echo '<p>$' . number_format($row['Item_Price'], 2) . '</p>';
+                echo '<button>Add to Cart</button>';
+                echo '</div>';
+            }
+        } else {
+            echo "<p>Error loading products: " . mysqli_error($conn) . "</p>";
+        }
+      ?>
+    </div>
+  </section>
+
 
   <!-- Footer -->
   <footer>
@@ -134,3 +151,8 @@ session_start();
   <script src="js/index.js"></script> 
 </body>
 </html>
+
+<?php
+// close connection
+mysqli_close($conn);
+?>
