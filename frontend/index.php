@@ -47,13 +47,10 @@ if ($conn->connect_error) {
               <a href="#">Profile</a>
               <a href="#">History</a>
               <a href="#">Orders</a>
-              <a href="logout.php">Sign Out</a>
+              <a href="index.php">Sign Out</a>
             </div>
           <?php else: ?>
             <a href="signin.php">Hello, Sign in</a>
-            <div class="dropdown-menu">
-              <a href="createacc.php">Create Account</a>
-            </div>
           <?php endif; ?>
         </li>
       </ul>
