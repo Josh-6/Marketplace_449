@@ -1,7 +1,7 @@
 <?php
 session_start();
 // Example: for testing, uncomment the next line to simulate a logged-in user
- $_SESSION['username'] = "Alejandro";
+// $_SESSION['username'] = "Alejandro";
 // $_SESSION['username'] = "Josh";
 // $_SESSION['username'] = "Tony";
 ?>
