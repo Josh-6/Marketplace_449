@@ -1,5 +1,20 @@
 <?php
 // index.php
+// Load configuration settings
+$servername = "localhost";
+$username = "root";
+$password = "";
+
+$conn = new mysqli($servername, $username, $password);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+//check session for user login status
+// session_start();
+
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -77,6 +92,31 @@
       </div>
     </div>
   </section>
+  <section>
+
+    <h2>Featured Products</h2>
+    <div class="product-grid" id="product-grid">
+      <!-- Products will be loaded here In the mean time later on we can use js to load more products-->
+      <?php
+        $query = "SELECT Item_ID, Item_Name, Item_Description, Item_Price, Item_Tags, Item_Quantity FROM Marketplace.Item LIMIT 6";
+        $result = mysqli_query($conn, $query);
+        if ($result) {
+            while ($row = mysqli_fetch_assoc($result)) {
+                echo '<div class="product-card">';
+                echo '<img src="images/product_placeholder.png" alt="' . htmlspecialchars($row['Item_Name']) . ' image">'; // Placeholder image
+                echo '<h3>' . htmlspecialchars($row['Item_Name']) . '</h3>';
+                echo '<p>' . htmlspecialchars($row['Item_Description']) . '</p>';
+                echo '<p>$' . number_format($row['Item_Price'], 2) . '</p>';
+                echo '<button>Add to Cart</button>';
+                echo '</div>';
+            }
+        } else {
+            echo "<p>Error loading products: " . mysqli_error($conn) . "</p>";
+        }
+      ?>
+    </div>
+  </section>
+
 
   <!-- Footer -->
   <footer>
@@ -111,3 +151,8 @@
   <script src="js/index.js"></script> 
 </body>
 </html>
+
+<?php
+// close connection
+mysqli_close($conn);
+?>
