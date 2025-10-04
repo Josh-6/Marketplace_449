@@ -203,6 +203,69 @@ nav ul li a:hover {
     font-size: 1rem;
 }
 
+/* Products Section */
+
+.product {
+    padding: 60px 10%;
+    background: #f6f9f8;
+    text-align: center;
+}
+
+.product h2 {
+    font-size: 2rem;
+    margin-bottom: 40px;
+    color: #093028;
+}
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat( auto-fit , minmax(220px, 1fr));
+    gap: 25px;
+    padding: 40px 0;
+}
+.product-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+.product-card img {
+    max-width: 100%;
+    height: 150px;
+    object-fit: contain;
+    margin-bottom: 15px;
+}
+.product-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: #093028;
+}
+.product-card p {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 15px;
+}
+.product-card button {
+    background: #00695c;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+.product-card button:hover {
+    background: #004d40;
+}
+
+
+
 /* Footer */
 footer {
     background: #093028;
