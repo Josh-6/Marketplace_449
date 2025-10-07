@@ -85,3 +85,12 @@ create table IF NOT EXISTS Marketplace.Review(
     FOREIGN KEY (Buyer_ID) REFERENCES Marketplace.Buyer(Buyer_ID) ON DELETE CASCADE,
     FOREIGN KEY (Item_ID) REFERENCES Marketplace.Item(Item_ID) ON DELETE CASCADE
 );
+
+-- Users table for application accounts (buyers/sellers/admin)
+CREATE TABLE IF NOT EXISTS Marketplace.Users (
+    User_ID INT PRIMARY KEY AUTO_INCREMENT,
+    Username VARCHAR(50) NOT NULL UNIQUE,
+    PasswordHash VARCHAR(255) NOT NULL,
+    Role VARCHAR(20) NOT NULL DEFAULT 'buyer',
+    Created_At DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
