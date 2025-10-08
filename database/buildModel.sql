@@ -51,6 +51,7 @@ create table IF NOT EXISTS Marketplace.Item(
     Item_Price float not null,
     Item_Tags varchar(45),
     Item_Quantity int not null,
+    Added_On timestamp not null,
     -- Item_Image varchar(100),   may be as a BLOB or link to a Object Storage Service
     FOREIGN KEY (Seller_ID) REFERENCES Marketplace.Seller(Seller_ID) ON DELETE CASCADE,
     FOREIGN KEY (Cart_ID) REFERENCES Marketplace.Cart(Cart_ID)
