@@ -15,11 +15,11 @@
     <div class="form-background">
         <div class="form-popup">
             <h1>Sign in or create an account</h1>
-            <form class="form-container" id="siginForm"> 
+            <form class="form-container" id="siginForm" method="post" action="../backend/login.php"> 
                 
 
                 <label for="user"><b>User Name</b></label>
-                <input type="text" id="user" placeholder="Enter User Name" name="user_name" required />
+                <input type="text" id="user" placeholder="Enter User Name" name="user" required />
 
                 <label for="psw"><b>Password</b></label>
                 <input type="password" id="psw" placeholder="Enter Password" name="psw" required />
@@ -27,9 +27,7 @@
                 <div id = "reveal-password">
                     <input type="checkbox" id="showPassword"> <label for="showPassword">Show Password</label>
                 </div>
-                <!--btn submit is causing a small issue that it has no where to currently send data to so need to click-->
-                <!--which causes page to refresh instead of sending to index, will fix itself when backend implemented-->
-                <button type="submit" class="btn submit" onclick="location.href='index.php'">Sign in</button>
+                <button type="submit" class="btn submit">Sign in</button>
                 <button type="button" class="btn cancel" onclick="location.href='index.php'">Close</button>
 
                 <div class="form">

@@ -12,7 +12,7 @@
     <div class="form-background">
         <div class="form-popup">
             <h1>Create an account</h1>
-            <form class="form-container" id="createAccountForm"> 
+            <form class="form-container" id="createAccountForm" method="post" action="../backend/register.php"> 
                 
                 <label for="user"><b>User Name</b></label>
                 <input type="text" id="user" placeholder="Enter User Name" name="user" required />
@@ -28,7 +28,7 @@
                     <label for="showPassword">Show Passwords</label>
                 </div>
 
-                <button type="submit" class="btn submit" onclick="location.href='index.php'">Create Account</button>
+                <button type="submit" class="btn submit">Create Account</button>
                 <button type="button" class="btn cancel" onclick="location.href='index.php'">Cancel</button>
             </form>
         </div>
