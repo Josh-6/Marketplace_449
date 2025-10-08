@@ -54,11 +54,11 @@
     }
 
     //Items
-    $query = "INSERT INTO Marketplace.Item (Item_ID, Seller_ID, Cart_ID, Item_Name, Item_Description, Item_Price, Item_Tags, Item_Quantity)
+    $query = "INSERT INTO Marketplace.Item (Item_ID, Seller_ID, Cart_ID, Item_Name, Item_Description, Item_Price, Item_Tags, Item_Quantity, Added_On)
         VALUES
-        (1, 1, 1, 'Laptop', 'High performance laptop', 1200.00, 'electronics,computer', 10),
-        (2, 2, 2, 'Novel', 'Bestselling fiction novel', 20.00, 'books,reading', 50),
-        (3, 1, NULL, 'Headphones', 'Noise-cancelling headphones', 150.00, 'electronics,audio', 25);";
+        (1, 1, 1, 'Laptop', 'High performance laptop', 1200.00, 'electronics,computer', 10, CURRENT_TIMESTAMP),
+        (2, 2, 2, 'Novel', 'Bestselling fiction novel', 20.00, 'books,reading', 50, CURRENT_TIMESTAMP),
+        (3, 1, NULL, 'Headphones', 'Noise-cancelling headphones', 150.00, 'electronics,audio', 25, CURRENT_TIMESTAMP);";
 
     $queryStatus = mysqli_query($conn, $query);
     if (!$queryStatus) {
