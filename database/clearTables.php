@@ -16,7 +16,18 @@
         echo "Error deleting data: " . mysqli_error($conn);
     }
     else {
-        echo "Data deleted successfully.";
+        echo "Data deleted successfully.\n";
     }
+
+    // drop views
+    $query = "Drop view IF EXISTS New_Products;";
+    $queryStatus = mysqli_query($conn, $query);
+    if (!$queryStatus) {
+        echo "Error deleting data: " . mysqli_error($conn);
+    }
+    else {
+        echo "Data deleted successfully.\n";
+    }
+    
     mysqli_close($conn);
 ?>
