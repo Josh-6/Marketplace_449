@@ -6,19 +6,16 @@ session_start();
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "Marketplace";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
-}
+$dbname = "marketplace";
 
 // Check if the user is logged in
 // NOTE: Call out this if statement to debug !!!!!!
-if (!isset($_SESSION['username'])) {
-    header("Location: login.php");
-    exit();
-}
+// if (!isset($_SESSION['username'])) {
+//     header("Location: signin.php");
+//     exit();
+// }
+
+
 
 // // Get the username from the session
 // $username = $_SESSION['username'];
@@ -26,18 +23,22 @@ if (!isset($_SESSION['username'])) {
 // Check if the form has been submitted
 // NOTE: Image still needs to be added !!!!!!!!!!!!!!!!!!!!!!!!!
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
     $price = floatval(str_replace(['$'], [''],$_POST['currencyInput']));    
-    $name = $_POST['name'];
-    $description = $_POST['description'];
+    $name = strip_tags($_POST['name']);
+    $description = strip_tags($_POST['description']);
     // $image = $_FILES['image'];
     $tags = $_POST['category'];
     $quantity = $_POST['quantity'];
     $new_item_id = 0;
+    $user_id = 99; // $_SESSION['user_id'];
     
     //getting last item id
-    $sql = "SELECT Item_ID FROM Items ORDER BY Item_ID DESC LIMIT 1";
-    $result = $conn->query($sql);
+    $query = "SELECT * FROM Item ORDER BY Item_ID DESC LIMIT 1;";
+    $result = $conn->query($query);
     if ($result){
         $row = $result->fetch_assoc();
         $last_item_id = $row['Item_ID'];
@@ -50,14 +51,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Bind the parameters
     $stmt->bind_param(
-        "iissfsd", $new_item_id, $_SESSION['user_id'], $name, $description, $price, $tags, $quantity 
+        "iissdsi", $new_item_id, $user_id, $name, $description, $price, $tags, $quantity 
     );
 
     // Execute the statement
     $stmt->execute();
 
+    echo "uploaded Successfully";
+
     // Close the statement
     $stmt->close();
+
+    $conn->close();
 }
 
 
@@ -95,6 +100,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <label for="currencyInput">Price (USD):</label>
         <input type="text" id="currencyInput" name ="currencyInput" placeholder="$0.00"  required oninput="formatCurrencyInput(event)">
         <br>
+
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" min="1" required><br><br>
         
         <!-- <label for="image">Product Image:</label>
         <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,.gif" required><br><br> -->
@@ -143,8 +151,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     document.getElementById('currencyInput').addEventListener('input', formatCurrencyInput);
 </script>
-
-<?php
-// close connection
-mysqli_close($conn);
-?>
