@@ -10,7 +10,8 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
-    $query = "drop tables IF EXISTS Users, Review, Payment_Method, Payment, Item, Seller, Cart, Buyer, Customer_Support;";
+    $query = "drop tables IF EXISTS Review, Payment_Method, Payment, Item, Seller, Cart, Buyer, Users, Customer_Support;";
+
     $queryStatus = mysqli_query($conn, $query);
     if (!$queryStatus) {
         echo "Error deleting data: " . mysqli_error($conn);

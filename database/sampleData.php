@@ -1,4 +1,4 @@
- <?php
+<?php
     $servername = "localhost";
     $username = "root";
     $password = "";
@@ -20,11 +20,24 @@
     if (!$queryStatus) {
         echo "Error inserting data: " . mysqli_error($conn);
     }
-    //buyers
-    $query = "INSERT INTO Marketplace.Buyer (Buyer_ID, CS_ID, Buyer_Email, Buyer_DateOfBirth, Buyer_Phone_Number, Buyer_Name, Buyer_Valid_ID, Buyer_Location)
+
+    //users
+    $query = "INSERT INTO Marketplace.Users (User_ID, Username, User_Email, PasswordHash, Role, Created_At, Valid_ID, Full_Name, User_dob)
         VALUES
-        (1, 1, 'buyer1@example.com', '1990-04-10', '555-3000', 'Charlie Green', 'B12345', 'Boston'),
-        (2, 2, 'buyer2@example.com', '1985-09-25', '555-4000', 'Diana Brown', 'B67890', 'Chicago');";
+        (1, 'alice', 'Ou0Xb@example.com', 'password1', 'buyer', '2023-01-01', '123456789', 'Alice Johnson', '1990-05-15'),
+        (2, 'bob', 'yE2t6@example.com', 'password2', 'buyer', '2023-02-01', '987654321', 'Bob Smith', '1995-08-20'),
+        (3, 'admin', 'E2t6@example.com', 'password3', 'admin', '2023-02-01', '987654321', 'Bob Smith', '1995-08-20');";
+
+    $queryStatus = mysqli_query($conn, $query);
+    if (!$queryStatus) {
+        echo "Error inserting data: " . mysqli_error($conn);
+    }
+
+    //buyers
+    $query = "INSERT INTO Marketplace.Buyer (Buyer_ID, CS_ID, Buyer_Phone_Number, Buyer_Location)
+        VALUES
+        (1, 1, '555-3000',  'Boston'),
+        (2, 2, '555-4000', 'Chicago');";
 
     $queryStatus = mysqli_query($conn, $query);
     if (!$queryStatus) {
@@ -43,10 +56,10 @@
     }
 
     //sellers
-    $query = "INSERT INTO Marketplace.Seller (Seller_ID, CS_ID, Seller_Name, Seller_Email, Seller_DateOfBirth, Seller_Valid_ID, Seller_Phone_Number, Seller_Stars, Seller_Location)
+    $query = "INSERT INTO Marketplace.Seller (Seller_ID, CS_ID, Seller_Phone_Number, Seller_Stars, Seller_Location)
         VALUES
-        (1, 1, 'ElectroMart', 'seller1@market.com', '1980-05-12', 1111, '555-5000', 5, 'San Francisco'),
-        (2, 2, 'BookWorld', 'seller2@market.com', '1975-11-30', 2222, '555-6000', 4, 'Seattle');";
+        (1, 1, '555-5000', 5, 'San Francisco'),
+        (2, 2, '555-6000', 4, 'Seattle');";
 
     $queryStatus = mysqli_query($conn, $query);
     if (!$queryStatus) {
