@@ -9,16 +9,26 @@ create table IF NOT EXISTS Marketplace.Customer_Support (
     CS_location varchar(45) not null
 );
 
+-- Users table for application accounts (buyers/sellers/admin)
+CREATE TABLE IF NOT EXISTS Marketplace.Users (
+    User_ID INT PRIMARY KEY AUTO_INCREMENT,
+    Username VARCHAR(50) NOT NULL UNIQUE,
+    User_Email varchar(45) not null unique,
+    PasswordHash VARCHAR(255) NOT NULL,
+    Role VARCHAR(20) NOT NULL DEFAULT 'buyer',
+    Created_At DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    Valid_ID varchar(20),
+    Full_Name VARCHAR(50),
+    User_dob date
+);
+
 create table IF NOT EXISTS Marketplace.Buyer (
-    Buyer_ID int primary key,
+    Buyer_ID int,
     CS_ID int,
-    Buyer_Email varchar(45) not null unique,
-    Buyer_DateOfBirth date not null,
     Buyer_Phone_Number varchar(15) not null unique,
-    Buyer_Name varchar(30) not null,
-    Buyer_Valid_ID varchar(20) not null unique,  -- not sure what is this for --
     Buyer_Location varchar(45) not null,
-    FOREIGN KEY (CS_ID) REFERENCES Marketplace.Customer_Support(CS_ID)
+    FOREIGN KEY (CS_ID) REFERENCES Marketplace.Customer_Support(CS_ID),
+    FOREIGN KEY (Buyer_ID) REFERENCES Marketplace.Users(User_ID) ON DELETE CASCADE
 );
 
 create table IF NOT EXISTS Marketplace.Cart (
@@ -29,16 +39,13 @@ create table IF NOT EXISTS Marketplace.Cart (
 );
 
 CREATE TABLE IF NOT EXISTS Marketplace.Seller (
-    Seller_ID INT PRIMARY KEY,
+    Seller_ID INT,
     CS_ID INT,
-    Seller_Name VARCHAR(30) NOT NULL,
-    Seller_Email VARCHAR(45) NOT NULL UNIQUE,
-    Seller_DateOfBirth DATE NOT NULL,
-    Seller_Valid_ID INT NOT NULL UNIQUE,
     Seller_Phone_Number VARCHAR(15) NOT NULL UNIQUE,
     Seller_Stars INT NOT NULL CHECK (Seller_Stars >= 1 AND Seller_Stars <= 5),
     Seller_Location VARCHAR(45) NOT NULL,
-    FOREIGN KEY (CS_ID) REFERENCES Marketplace.Customer_Support(CS_ID)
+    FOREIGN KEY (CS_ID) REFERENCES Marketplace.Customer_Support(CS_ID),
+    FOREIGN KEY (Seller_ID) REFERENCES Marketplace.Users(User_ID) ON DELETE CASCADE
 );
 
 -- IF seller is deleted, all his items are deleted too, so backend needs to deal with the case!!!!!!!!!
@@ -87,11 +94,3 @@ create table IF NOT EXISTS Marketplace.Review(
     FOREIGN KEY (Item_ID) REFERENCES Marketplace.Item(Item_ID) ON DELETE CASCADE
 );
 
--- Users table for application accounts (buyers/sellers/admin)
-CREATE TABLE IF NOT EXISTS Marketplace.Users (
-    User_ID INT PRIMARY KEY AUTO_INCREMENT,
-    Username VARCHAR(50) NOT NULL UNIQUE,
-    PasswordHash VARCHAR(255) NOT NULL,
-    Role VARCHAR(20) NOT NULL DEFAULT 'buyer',
-    Created_At DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
