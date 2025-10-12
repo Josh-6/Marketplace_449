@@ -17,6 +17,9 @@
                 <label for="user"><b>User Name</b></label>
                 <input type="text" id="user" placeholder="Enter User Name" name="user" required />
 
+                <label for="email"><b>Email</b></label>
+                <input type="text" id="email" placeholder="Enter Email" name="email" required />
+
                 <label for="psw"><b>Password</b></label>
                 <input type="password" id="psw" placeholder="Enter Password" name="psw" required />
 

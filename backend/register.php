@@ -8,11 +8,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 require_once __DIR__ . '/../database/db_connect.php';
 
 $username = isset($_POST['user']) ? trim($_POST['user']) : '';
+$email = isset($_POST['email']) ? trim($_POST['email']) : '';
 $password = isset($_POST['psw']) ? $_POST['psw'] : '';
 $password_repeat = isset($_POST['psw-repeat']) ? $_POST['psw-repeat'] : '';
 
 // Basic validation
-if ($username === '' || $password === '') {
+if ($username === '' || $email === '' || $password === '') {
     // missing fields
     header('Location: createacc.php?error=missing');
     exit;
@@ -46,7 +47,7 @@ if (!$conn->query($create_users_sql)) {
 }
 
 // Prepared statement to avoid SQL injection
-$stmt = $conn->prepare('INSERT INTO Users (Username, PasswordHash) VALUES (?, ?)');
+$stmt = $conn->prepare('INSERT INTO Users (Username, User_Email, PasswordHash) VALUES (?, ?, ?)');
 if (!$stmt) {
     // If prepare failed, log error and try to surface a helpful message
     error_log('Prepare failed: ' . $conn->error);
@@ -56,7 +57,7 @@ if (!$stmt) {
 }
 
 $password_hash = password_hash($password, PASSWORD_DEFAULT);
-$stmt->bind_param('ss', $username, $password_hash);
+$stmt->bind_param('sss', $username, $email, $password_hash);
 
 if ($stmt->execute()) {
     $stmt->close();

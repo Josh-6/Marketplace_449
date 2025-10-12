@@ -10,15 +10,14 @@ $dbname = "marketplace";
 
 // Check if the user is logged in
 // NOTE: Call out this if statement to debug !!!!!!
-// if (!isset($_SESSION['username'])) {
-//     header("Location: signin.php");
-//     exit();
-// }
-
-
-
-// // Get the username from the session
-// $username = $_SESSION['username'];
+if (!isset($_SESSION['username'])) {
+    header("Location: signin.php");
+    exit();
+}
+if (!isset($_SESSION['seller_registered'])) {
+    header("Location: enroll_as_seller.php");
+    exit();
+}
 
 // Check if the form has been submitted
 // NOTE: Image still needs to be added !!!!!!!!!!!!!!!!!!!!!!!!!
@@ -34,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tags = $_POST['category'];
     $quantity = $_POST['quantity'];
     $new_item_id = 0;
-    $user_id = 99; // $_SESSION['user_id'];
+    $user_id = $_SESSION['user_id'];
     
     //getting last item id
     $query = "SELECT * FROM Item ORDER BY Item_ID DESC LIMIT 1;";
@@ -47,17 +46,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $stmt = $conn->prepare(
         "INSERT INTO Item (Item_ID, Seller_ID, Item_Name, Item_Description, Item_Price, Item_Tags, Item_Quantity, Added_On) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())"
-        );
+    );
+    if (!$stmt) {
+        die('Prepare failed: ' . $conn->error);
+    }
 
-    // Bind the parameters
+    // Bind the parameters (types: i = int, s = string, d = double)
     $stmt->bind_param(
-        "iissdsi", $new_item_id, $user_id, $name, $description, $price, $tags, $quantity 
+        "iissdii", $new_item_id, $user_id, $name, $description, $price, $tags, $quantity
     );
 
-    // Execute the statement
-    $stmt->execute();
-
-    echo "uploaded Successfully";
+    // Execute the statement with error handling
+    if (!$stmt->execute()) {
+        // Provide a readable error message
+        echo "Database error: " . $stmt->error;
+    } else {
+        echo "Uploaded successfully";
+    }
 
     // Close the statement
     $stmt->close();
