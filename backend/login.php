@@ -17,7 +17,7 @@ if ($username === '' || $password === '') {
 
 $conn = get_db_connection();
 
-$stmt = $conn->prepare('SELECT User_ID, Username, PasswordHash FROM Users WHERE Username = ? LIMIT 1');
+$stmt = $conn->prepare('SELECT User_ID, Username, PasswordHash, Role FROM Users WHERE Username = ? LIMIT 1');
 if (!$stmt) {
     error_log('Prepare failed (login): ' . $conn->error);
     $conn->close();
@@ -38,12 +38,12 @@ if ($row = $result->fetch_assoc()) {
         $_SESSION['user_id'] = $row['User_ID'];
         $_SESSION['username'] = $row['Username'];
         $roles = explode(' ', $row['Role']);
-        if ($roles.count() > 1 && in_array('seller', $roles)) {
+        if (count($roles) > 0 && in_array('seller', $roles)) {
             $_SESSION['seller_registered'] = true;
-        };
+        }
         $stmt->close();
         $conn->close();
-        header('Location: index.php');
+        header('Location: ../frontend/index.php');
         exit;
 
     }
