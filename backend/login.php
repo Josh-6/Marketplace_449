@@ -31,16 +31,21 @@ $result = $stmt->get_result();
 
 if ($row = $result->fetch_assoc()) {
     if (password_verify($password, $row['PasswordHash'])) {
-    session_start();
-    // prevent session fixation
-    session_regenerate_id(true);
-    // store minimal user info in session
-    $_SESSION['user_id'] = $row['User_ID'];
-    $_SESSION['username'] = $row['Username'];
+        session_start();
+        // prevent session fixation
+        session_regenerate_id(true);
+        // store minimal user info in session
+        $_SESSION['user_id'] = $row['User_ID'];
+        $_SESSION['username'] = $row['Username'];
+        $roles = explode(' ', $row['Role']);
+        if ($roles.count() > 1 && in_array('seller', $roles)) {
+            $_SESSION['seller_registered'] = true;
+        };
         $stmt->close();
         $conn->close();
         header('Location: index.php');
         exit;
+
     }
 }
 

@@ -99,6 +99,7 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
         <li><a href="index.php">Home</a></li>
         <li><a href="product_page.php">Products</a></li>
         <li><a href="#">Categories</a></li>
+        <li><a href="upload_item.php">Sell Item</a></li>
         <li><a href="#">About</a></li>
         <li><a href="#">Contact Us</a></li>
         <li class="dropdown">
