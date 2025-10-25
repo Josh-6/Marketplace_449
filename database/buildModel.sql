@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS Marketplace.Seller (
 );
 
 -- IF seller is deleted, all his items are deleted too, so backend needs to deal with the case!!!!!!!!!
-create table IF NOT EXISTS Marketplace.Item(
+create table IF NOT EXISTS Marketplace.Item (
     Item_ID int primary key,
     Seller_ID int not null,
     Cart_ID int,

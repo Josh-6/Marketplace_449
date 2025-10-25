@@ -268,3 +268,65 @@ nav ul li a:hover {
     }
 }
 
+/* Section 2: Tabs Container */
+.profile-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    border-bottom: 1px solid #ddd;
+    padding: 15px 0;
+    background: #fff;
+}
+
+/* Tab Buttons */
+.tab-button {
+    background: none;
+    border: none;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #888; /* inactive default */
+    cursor: pointer;
+    padding-bottom: 5px;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+}
+
+/* Hover effect for inactive tabs */
+.tab-button:hover {
+    color: #000; /* change to black on hover */
+}
+
+.tab-button:hover::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    background: #000;
+}
+
+/* Active Tab */
+.tab-button.active {
+    color: #000;
+    font-weight: 600;
+}
+
+.tab-button.active::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    background: #000;
+}
+
+/* Responsive Layout */
+@media (max-width: 600px) {
+    .profile-tabs {
+        gap: 20px;
+        font-size: 0.95rem;
+    }
+}
+
