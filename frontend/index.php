@@ -148,7 +148,7 @@ session_start();
     <div class="product-grid" id="product-grid">
       <!-- Products will be loaded here In the mean time later on we can use js to load more products-->
       <?php
-      $query = "SELECT * FROM Marketplace.new_products";
+      $query = "SELECT * FROM Marketplace.new_products LIMIT 10";
       $result = mysqli_query($conn, $query);
       if ($result) {
         while ($row = mysqli_fetch_assoc($result)) {
