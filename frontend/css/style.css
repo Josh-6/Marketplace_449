@@ -63,7 +63,7 @@ nav ul li a:hover {
 /* The dropdown box */
 .dropdown-menu {
     position: absolute;
-    top: 100%;           /* directly below the menu item */
+    top: 90%;           /* directly below the menu item */
     left: 0;
     width: 7vw;        /* full viewport width */
     background: yellow; /* change to niceer color later */
