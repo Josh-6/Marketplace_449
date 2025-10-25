@@ -64,6 +64,18 @@ create table IF NOT EXISTS Marketplace.Item(
     FOREIGN KEY (Cart_ID) REFERENCES Marketplace.Cart(Cart_ID)
 );
 
+CREATE TABLE IF NOT EXISTS Marketplace.User_History (
+    History_ID INT PRIMARY KEY AUTO_INCREMENT,
+    User_ID INT NOT NULL,
+    Item_ID INT NOT NULL,
+    History_Type ENUM('view', 'purchase') NOT NULL DEFAULT 'view',
+    Quantity INT DEFAULT NULL,  -- used for purchases, NULL for views
+    Viewed_At DATETIME DEFAULT NULL,
+    Purchased_At DATETIME DEFAULT NULL,
+    FOREIGN KEY (User_ID) REFERENCES Marketplace.Users(User_ID) ON DELETE CASCADE,
+    FOREIGN KEY (Item_ID) REFERENCES Marketplace.Item(Item_ID) ON DELETE CASCADE
+);
+
 create table IF NOT EXISTS Marketplace.Payment(
     Payment_ID int primary key,
     Cart_ID int not null,
