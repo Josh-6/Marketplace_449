@@ -106,7 +106,7 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
               <?php if (isset($_SESSION['username'])): ?>
             <a href="#">Hello, <?php echo htmlspecialchars($_SESSION['username']); ?></a>
             <div class="dropdown-menu">
-              <a href="#">Profile</a>
+              <a href="profile.php">Profile</a>
               <a href="#">History</a>
               <a href="#">Orders</a>
                   <a href="../backend/logout.php">Sign Out</a>
