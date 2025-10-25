@@ -24,7 +24,7 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marketplace - eCommerce Home Page</title>
     <!-- Correct CSS path -->
-    <link rel="stylesheet" href="css/style.css?v=1" /><!-- If stylesheet changes notrelected increment number -->
+    <link rel="stylesheet" href="css/profile.css?v=1" /><!-- If stylesheet changes notrelected increment number -->
 </head>
 
 <header>
@@ -41,7 +41,7 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
                 <?php if (isset($_SESSION['username'])): ?>
                     <a href="#">Hello, <?php echo htmlspecialchars($_SESSION['username']); ?></a>
                     <div class="dropdown-menu">
-                        <a href="#">Profile</a>
+                        <a href="profile.php">Profile</a>
                         <a href="#">History</a>
                         <a href="#">Orders</a>
                         <a href="../backend/logout.php">Sign Out</a>
@@ -56,3 +56,37 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
         🔍 <a href="cart.php" style="text-decoration:none;color:inherit;">🛒 Cart (<?php echo isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0; ?>)</a>
     </div>
 </header>
+
+<!-- Section 1: Profile Header -->
+<section class="profile-header">
+    <div class="profile-container">
+        <!-- Profile Picture -->
+        <div class="profile-image">
+            <img src="images/kitten.png" alt="Profile Picture">
+            <button class="edit-photo-btn">✎</button>
+        </div>
+
+        <!-- User Info -->
+        <div class="profile-info">
+            <h2 class="username"><?php echo htmlspecialchars($_SESSION['username']); ?></h2>
+            <p class="username-text">To change your username, visit</p>
+            <a href="#" class="account-settings-link">Account settings</a>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="profile-actions">
+            <button class="edit-profile">Edit Profile</button>
+            <div class="edit-buttons">
+                <button class="cancel-btn">Cancel</button>
+                <button class="save-btn">Save</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- JS file -->
+<script src="js/profile.js"></script>
+
+</html>
