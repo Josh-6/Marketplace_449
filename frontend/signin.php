@@ -28,7 +28,7 @@
                     <input type="checkbox" id="showPassword"> <label for="showPassword">Show Password</label>
                 </div>
                 <button type="submit" class="btn submit">Sign in</button>
-                <button type="button" class="btn cancel" onclick="location.href='index.php'">Close</button>
+                <button type="button" class="btn cancel" onclick="location.href='index.php'">Cancel</button>
 
                 <div class="form">
                     <p>Don't have an account? <a href="createacc.php">Start Here.</a></p>

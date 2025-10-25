@@ -33,6 +33,10 @@
 
                 <button type="submit" class="btn submit">Create Account</button>
                 <button type="button" class="btn cancel" onclick="location.href='index.php'">Cancel</button>
+
+                <div class="form">
+                    <p>Already have an account? <a href="signin.php">Sign In Here.</a></p>
+                </div>
             </form>
         </div>
     </div>
