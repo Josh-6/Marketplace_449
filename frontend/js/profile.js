@@ -19,20 +19,30 @@ function exitEditMode() {
 editProfileBtn.addEventListener('click', enterEditMode);
 cancelBtn.addEventListener('click', exitEditMode);
 
-// Section 2: Tab Switching Logic
+// Section 2 & 3: Tab Switching Logic
 document.addEventListener("DOMContentLoaded", () => {
     const tabs = document.querySelectorAll(".tab-button");
+    const tabContents = document.querySelectorAll(".tab-content");
 
     tabs.forEach(tab => {
         tab.addEventListener("click", () => {
-            // Remove active class from all tabs
+            const target = tab.dataset.tab; // item-history, order-history, or account-settings
+
+            // Remove 'active' from all tabs and tab contents
             tabs.forEach(t => t.classList.remove("active"));
-            // Add active class to clicked tab
+            tabContents.forEach(tc => tc.classList.remove("active"));
+
             tab.classList.add("active");
-            //console.log("Switchin actives");
-            // Future: Display corresponding content in Section 3
-            // Example:
-            // showSection(tab.dataset.tab);
+
+            // Show tab content
+            const activeContent = document.getElementById(target);
+            if (activeContent) {
+                activeContent.classList.add("active");
+            }
+
+            console.log(`Switched to tab: ${target}`);
         });
     });
 });
+
+

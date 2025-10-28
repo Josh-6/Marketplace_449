@@ -5,15 +5,14 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Ensure user is logged in
-/*if (!isset($_SESSION['username'])) {
-    header("Location: signin.php");
-    exit;
-}*/
 /*
+
+}*/
+
 include __DIR__ . '/../database/db_connect.php'; // your DB connection
 
 $conn = get_db_connection();
-echo 'console.log("Database connected!")';
+//echo 'console.log("Database connected!")';
 
 $userId = $_SESSION['user_id'] ?? 0;
 
@@ -30,8 +29,9 @@ $stmt1 = $conn->prepare("
 $stmt1->bind_param("i", $userId);
 $stmt1->execute();
 $itemHistory = $stmt1->get_result()->fetch_all(MYSQLI_ASSOC);
+$itemCount = count($itemHistory) > 0; // true if greater than 0, else false
 
-// Fetch Order History (30 most recent)
+// Fetch Order History (20 most recent)
 $stmt2 = $conn->prepare("
     SELECT I.Item_ID, I.Item_Name, I.Item_Price, UH.Quantity, UH.Purchased_At
     FROM Marketplace.User_History UH
@@ -43,7 +43,8 @@ $stmt2 = $conn->prepare("
 $stmt2->bind_param("i", $userId);
 $stmt2->execute();
 $orderHistory = $stmt2->get_result()->fetch_all(MYSQLI_ASSOC);
-*/
+$orderCount = count($orderHistory) > 0; // true if greater than 0, else false
+
 // Pagination logic
 /*
 $itemsPerPage = 10;
@@ -115,7 +116,7 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
 
         <!-- Action Buttons -->
         <div class="profile-actions">
-            <button class="edit-profile">Edit Profile</button>
+            <button class="edit-profile">Edit Profile</button> <!--✎(black pen)-->
             <div class="edit-buttons">
                 <button class="cancel-btn">Cancel</button>
                 <button class="save-btn">Save</button>
@@ -130,11 +131,12 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
     <button class="tab-button" data-tab="order-history">Order History</button>
     <button class="tab-button" data-tab="account-settings">Account Settings</button>
 </section>
-<!--
-    Section 3 (Tab Content) 
-    <section class="profile-content">
-        <div id="item-history" class="tab-content active">
-            <div class="item-history-container">
+
+<!--Section 3 (Tab Content) -->
+<section class="profile-content">
+    <div id="item-history" class="tab-content active">
+        <div class="item-history-container">
+            <?php if ($itemCount): ?>
                 <?php foreach ($itemHistory as $item): ?>
                     <div class="product-card">
                         <img src="images/placeholder.png" alt="<?= htmlspecialchars($item['Item_Name']) ?>">
@@ -143,11 +145,15 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
                         <div class="price">$<?= htmlspecialchars($item['Item_Price']) ?></div>
                     </div>
                 <?php endforeach; ?>
-            </div>
+            <?php else: ?>
+                <div class="empty-message">No items viewed</div>
+            <?php endif; ?>
         </div>
+    </div>
 
-        <div id="order-history" class="tab-content">
-            <div class="order-history-container">
+    <div id="order-history" class="tab-content">
+        <div class="order-history-container">
+            <?php if ($orderCount): ?>
                 <?php foreach ($orderHistory as $order): ?>
                     <div class="order-card">
                         <div class="order-header">
@@ -161,10 +167,22 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
                         </div>
                     </div>
                 <?php endforeach; ?>
-            </div>
+            <?php else: ?>
+                <div class="empty-message">No previous orders</div>
+            <?php endif; ?>
         </div>
-    </section>
-                -->
+    </div>
+
+    <div id="account-settings" class="tab-content">
+        <div class="account-settings-container">
+            <div class="empty-message">Account Settings</div>
+        </div>
+    </div>
+
+</section>
+
+
+
 <!-- JS file -->
 <script src="js/profile.js"></script>
 
