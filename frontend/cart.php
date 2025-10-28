@@ -1,5 +1,12 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
+
+include __DIR__ . '/../database/db_connect.php'; // your DB connection
+
+$conn = get_db_connection();
+//echo 'console.log("Database connected!")';
 
 // initialize cart in session if missing
 if (!isset($_SESSION['cart'])) {
@@ -8,7 +15,8 @@ if (!isset($_SESSION['cart'])) {
 $cart = &$_SESSION['cart'];
 
 // Helper: find index by product id
-function find_cart_index($id) {
+function find_cart_index($id)
+{
   foreach ($_SESSION['cart'] as $i => $it) {
     if ((string)$it['id'] === (string)$id) return $i;
   }
@@ -41,6 +49,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'description' => $description,
         'quantity' => $quantity,
       ];
+    }
+
+    // add item as viewed in History
+    if (isset($_SESSION['user_id'])) {
+      $userId = $_SESSION['user_id'];
+
+      // Use prepared statement
+      $stmt = $conn->prepare("
+            INSERT INTO Marketplace.User_History
+            (User_ID, Item_ID, History_Type, Viewed_At)
+            VALUES (?, ?, 'view', NOW())
+        ");
+      $stmt->bind_param("ii", $userId, $id);
+      $stmt->execute();
+      echo "<script>console.log('Viewed Item ID $id for User ID $userId');</script>";
+      $stmt->close();
     }
 
     // redirect to avoid form resubmission
@@ -93,20 +117,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Your Cart</title>
   <link rel="stylesheet" href="css/style.css?v=1">
   <style>
-    table { width: 80%; margin: 40px auto; border-collapse: collapse; }
-    th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-    th { background: #00695c; color: white; }
-    button { background: #00695c; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+    table {
+      width: 80%;
+      margin: 40px auto;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+    }
+
+    th {
+      background: #00695c;
+      color: white;
+    }
+
+    button {
+      background: #00695c;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
   </style>
 </head>
+
 <body>
 
- <header>
+  <header>
     <div class="logo">Marketplace</div>
     <nav>
       <ul>
@@ -120,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <?php if (isset($_SESSION['username'])): ?>
             <a href="#">Hello, <?php echo htmlspecialchars($_SESSION['username']); ?></a>
             <div class="dropdown-menu">
-              <a href="prifile.php">Profile</a>
+              <a href="profile.php">Profile</a>
               <a href="#">History</a>
               <a href="#">Orders</a>
               <a href="../backend/logout.php">Sign Out</a>
@@ -136,69 +184,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </header>
 
-<h2 style="text-align:center; margin-top:30px;">Your Shopping Cart</h2>
+  <h2 style="text-align:center; margin-top:30px;">Your Shopping Cart</h2>
 
-<?php if (empty($cart)): ?>
-  <p style="text-align:center;">Your cart is empty.</p>
-<?php else: ?>
-  <table>
-    <tr>
-      <th style="width:40%">Product</th>
-      <th>Price</th>
-      <th>Quantity</th>
-      <th>Subtotal</th>
-      <th>Action</th>
-    </tr>
-    <form method="post" action="cart.php?action=update">
-    <?php foreach ($cart as $item): ?>
-      <?php $subtotal = floatval($item['price']) * intval($item['quantity']); $total += $subtotal; ?>
+  <?php if (empty($cart)): ?>
+    <p style="text-align:center;">Your cart is empty.</p>
+  <?php else: ?>
+    <table>
       <tr>
-        <td style="text-align:left;">
-          <div style="display:flex;gap:12px;align-items:center;">
-            <?php if (!empty($item['image'])): ?>
-              <img src="<?= htmlspecialchars($item['image']) ?>" alt="<?= htmlspecialchars($item['name']) ?>" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid #eee;">
-            <?php endif; ?>
-            <div>
-              <strong><?= htmlspecialchars($item['name']) ?></strong>
-              <div style="font-size:0.9rem;color:#555;"><?= htmlspecialchars($item['description']) ?></div>
-            </div>
-          </div>
-        </td>
-        <td>$<?= number_format(floatval($item['price']), 2) ?></td>
-        <td>
-          <input type="number" name="quantities[<?= htmlspecialchars($item['id'], ENT_QUOTES) ?>]" value="<?= intval($item['quantity']) ?>" min="0" style="width:70px;padding:6px;border-radius:4px;border:1px solid #ccc;">
-        </td>
-        <td>$<?= number_format($subtotal, 2) ?></td>
-        <td>
-          <!-- Use a named submit button so we avoid nested forms. The top-level POST handler
+        <th style="width:40%">Product</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Subtotal</th>
+        <th>Action</th>
+      </tr>
+      <form method="post" action="cart.php?action=update">
+        <?php foreach ($cart as $item): ?>
+          <?php $subtotal = floatval($item['price']) * intval($item['quantity']);
+          $total += $subtotal; ?>
+          <tr>
+            <td style="text-align:left;">
+              <div style="display:flex;gap:12px;align-items:center;">
+                <?php if (!empty($item['image'])): ?>
+                  <img src="<?= htmlspecialchars($item['image']) ?>" alt="<?= htmlspecialchars($item['name']) ?>" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid #eee;">
+                <?php endif; ?>
+                <div>
+                  <strong><?= htmlspecialchars($item['name']) ?></strong>
+                  <div style="font-size:0.9rem;color:#555;"><?= htmlspecialchars($item['description']) ?></div>
+                </div>
+              </div>
+            </td>
+            <td>$<?= number_format(floatval($item['price']), 2) ?></td>
+            <td>
+              <input type="number" name="quantities[<?= htmlspecialchars($item['id'], ENT_QUOTES) ?>]" value="<?= intval($item['quantity']) ?>" min="0" style="width:70px;padding:6px;border-radius:4px;border:1px solid #ccc;">
+            </td>
+            <td>$<?= number_format($subtotal, 2) ?></td>
+            <td>
+              <!-- Use a named submit button so we avoid nested forms. The top-level POST handler
                will look for $_POST['remove'] and remove the item. -->
-          <button type="submit" name="remove" value="<?= htmlspecialchars($item['id'], ENT_QUOTES) ?>" style="background:#b71c1c;">Remove</button>
+              <button type="submit" name="remove" value="<?= htmlspecialchars($item['id'], ENT_QUOTES) ?>" style="background:#b71c1c;">Remove</button>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+        <tr>
+          <td colspan="5" style="text-align:right;">
+            <button type="submit">Update Cart</button>
+          </td>
+        </tr>
+      </form>
+      <!-- end update form -->
+
+
+      <tr>
+        <th colspan="3" style="text-align:right;">Total:</th>
+        <th colspan="2">$<?= number_format($total, 2) ?></th>
+      </tr>
+      <tr>
+        <td colspan="5" style="text-align:right;">
+          <!-- Checkout button: non-nested, links to the checkout page -->
+          <a href="checkout.php" style="display:inline-block;background:#00796b;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none;">Proceed to Payment</a>
         </td>
       </tr>
-    <?php endforeach; ?>
-    <tr>
-      <td colspan="5" style="text-align:right;">
-        <button type="submit">Update Cart</button>
-      </td>
-    </tr>
-    </form>
-    <!-- end update form -->
+    </table>
 
 
-    <tr>
-      <th colspan="3" style="text-align:right;">Total:</th>
-      <th colspan="2">$<?= number_format($total, 2) ?></th>
-    </tr>
-          <tr>
-      <td colspan="5" style="text-align:right;">
-        <!-- Checkout button: non-nested, links to the checkout page -->
-        <a href="checkout.php" style="display:inline-block;background:#00796b;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none;">Proceed to Payment</a>
-      </td>
-    </tr>
-  </table>
-
-
-<?php endif; ?>
+  <?php endif; ?>
 
 </body>
+
 </html>

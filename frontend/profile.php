@@ -158,6 +158,7 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
                     <div class="order-card">
                         <div class="order-header">
                             <div><strong>ORDER PLACED</strong><br><?= date("M d, Y", strtotime($order['Purchased_At'])) ?></div>
+                            <div><strong>QUANTITY</strong><br><?= $order['Quantity'] ?></div>
                             <div><strong>TOTAL</strong><br>$<?= $order['Item_Price'] * $order['Quantity'] ?></div>
                             <div><strong>ORDERED BY</strong><br><?= htmlspecialchars($_SESSION['username']) ?></div>
                         </div>

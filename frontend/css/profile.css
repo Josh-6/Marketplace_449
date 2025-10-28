@@ -275,7 +275,8 @@ nav ul li a:hover {
     gap: 40px;
     border-bottom: 1px solid #ddd;
     padding: 15px 0;
-    background: #fff;
+    background: #12766a;
+    /*background: #fff;*/
 }
 
 /* Tab Buttons */
