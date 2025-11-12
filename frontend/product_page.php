@@ -1,4 +1,6 @@
 <?php
+// make sure to fetch products with pagination and category filter not fetch once at the page cache loading
+
 // Ensure session is started so login state (e.g., $_SESSION['username']) is available
 if (session_status() === PHP_SESSION_NONE) {
   session_start();
@@ -42,16 +44,6 @@ $totalResult = $stmt->get_result()->fetch_assoc();
 $totalItems = $totalResult['total'];
 $totalPages = $totalItems > 0 ? ceil($totalItems / $itemsPerPage) : 1;
 
-// Get paginated products
-$productsQuery .= " LIMIT ? OFFSET ?";
-$stmt = $conn->prepare($productsQuery);
-if ($selectedCategory !== '') {
-    $stmt->bind_param("sii", $categoryParam, $itemsPerPage, $offset);
-} else {
-    $stmt->bind_param("ii", $itemsPerPage, $offset);
-}
-$stmt->execute();
-$paginatedProducts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 ?>
 
@@ -124,7 +116,7 @@ $paginatedProducts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
       <ul>
         <li><a href="index.php">Home</a></li>
         <li><a href="product_page.php">Products</a></li>
-        <li><a href="#">Categories</a></li>
+        <!-- <li><a href="#">Categories</a></li> -->
         <li><a href="upload_item.php">Sell Item</a></li>
         <li><a href="#">About</a></li>
         <li><a href="#">Contact Us</a></li>
@@ -153,7 +145,19 @@ $paginatedProducts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     <h2 style="margin:0;padding:0;"><?php echo $selectedCategory !== '' ? htmlspecialchars($selectedCategory) : 'All Products'; ?></h2>
   </div>
   
-  <?php foreach ($paginatedProducts as $p): ?>
+  <?php
+    // Get paginated products
+  $productsQuery .= " LIMIT ? OFFSET ?";
+  $stmt = $conn->prepare($productsQuery);
+  if ($selectedCategory !== '') {
+      $stmt->bind_param("sii", $categoryParam, $itemsPerPage, $offset);
+  } else {
+      $stmt->bind_param("ii", $itemsPerPage, $offset);
+  }
+  $stmt->execute();
+  $paginatedProducts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);      // Fetch as associative array is wrongly placed as cannot be updated when adding new products
+ 
+  foreach ($paginatedProducts as $p): ?>
     <div class="product-card">
       <img src="images/products/<?= htmlspecialchars($p['Item_ID']) ?>.jpg" alt="<?= htmlspecialchars($p['Item_Name']) ?>">
       <h3><?= htmlspecialchars($p['Item_Name']) ?></h3>

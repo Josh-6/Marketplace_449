@@ -37,7 +37,7 @@ session_start();
       <ul>
         <li><a href="index.php">Home</a></li>
         <li><a href="product_page.php">Products</a></li>
-        <li><a href="#">Categories</a></li>
+        <!-- <li><a href="#">Categories</a></li> -->
         <li><a href="upload_item.php">Sell Item</a></li>
         <li><a href="#">About</a></li>
         <li><a href="#">Contact Us</a></li>
@@ -67,7 +67,7 @@ session_start();
       <?php if (isset($_SESSION['username'])): ?>
         <h1>Welcome back, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
         <p>Here are some recommendations for you.</p>
-        <button>Shop Now</button>
+        <!-- <button>Shop Now</button> -->
       <?php else: ?>
         <h1>Exclusive Deals</h1>
         <p>Explore different categories. Find the best deals.</p>
