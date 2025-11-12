@@ -1,5 +1,10 @@
 <?php
+require_once __DIR__ . '/../backend/cartControl.php';
+require_once __DIR__ . '/../database/db_connect.php';
+
 session_start();
+
+$conn = get_db_connection();
 
 // initialize cart in session if missing
 if (!isset($_SESSION['cart'])) {
@@ -15,80 +20,21 @@ function find_cart_index($id) {
   return null;
 }
 
+// // Helper: get available stock for a product
+// function get_available_stock($item_id, $conn) {
+//   $stmt = $conn->prepare('SELECT Item_Quantity FROM Item WHERE Item_ID = ?');
+//   $stmt->bind_param('i', $item_id);
+//   $stmt->execute();
+//   $result = $stmt->get_result();
+//   $row = $result->fetch_assoc();
+//   $stmt->close();
+//   return $row ? intval($row['Item_Quantity']) : 0;
+// }
+
 $total = 0.0;
-
-// Handle actions: add, update, remove
 $action = $_GET['action'] ?? '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  if ($action === 'add') {
-    $id = $_POST['id'] ?? '';
-    $name = $_POST['name'] ?? '';
-    $price = floatval($_POST['price'] ?? 0);
-    $image = $_POST['image'] ?? '';
-    $description = $_POST['description'] ?? '';
-    $quantity = max(1, intval($_POST['quantity'] ?? 1));
+getAction($action);
 
-    // if item exists, increase qty, else push
-    $idx = find_cart_index($id);
-    if ($idx !== null) {
-      $_SESSION['cart'][$idx]['quantity'] += $quantity;
-    } else {
-      $_SESSION['cart'][] = [
-        'id' => $id,
-        'name' => $name,
-        'price' => $price,
-        'image' => $image,
-        'description' => $description,
-        'quantity' => $quantity,
-      ];
-    }
-
-    // redirect to avoid form resubmission
-    header('Location: cart.php');
-    exit;
-  }
-  // If a remove button was clicked (we use a named submit button), handle it first
-  if (!empty($_POST['remove'])) {
-    $id = $_POST['remove'];
-    $idx = find_cart_index($id);
-    if ($idx !== null) {
-      array_splice($_SESSION['cart'], $idx, 1);
-    }
-    header('Location: cart.php');
-    exit;
-  }
-
-  if ($action === 'update') {
-    // Update quantities
-    if (!empty($_POST['quantities']) && is_array($_POST['quantities'])) {
-      foreach ($_POST['quantities'] as $id => $q) {
-        $idx = find_cart_index($id);
-        if ($idx !== null) {
-          $q = max(0, intval($q));
-          if ($q === 0) {
-            // remove
-            array_splice($_SESSION['cart'], $idx, 1);
-          } else {
-            $_SESSION['cart'][$idx]['quantity'] = $q;
-          }
-        }
-      }
-    }
-    header('Location: cart.php');
-    exit;
-  }
-
-  // Backwards-compatible: if a dedicated remove form is used (not expected), support it
-  if ($action === 'remove') {
-    $id = $_POST['id'] ?? '';
-    $idx = find_cart_index($id);
-    if ($idx !== null) {
-      array_splice($_SESSION['cart'], $idx, 1);
-    }
-    header('Location: cart.php');
-    exit;
-  }
-}
 
 ?>
 <!DOCTYPE html>
@@ -112,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <ul>
         <li><a href="index.php">Home</a></li>
         <li><a href="product_page.php">Products</a></li>
-        <li><a href="#">Categories</a></li>
+        <!-- <li><a href="#">Categories</a></li> -->
         <li><a href="upload_item.php">Sell Item</a></li>
         <li><a href="#">About</a></li>
         <li><a href="#">Contact Us</a></li>
@@ -166,7 +112,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </td>
         <td>$<?= number_format(floatval($item['price']), 2) ?></td>
         <td>
-          <input type="number" name="quantities[<?= htmlspecialchars($item['id'], ENT_QUOTES) ?>]" value="<?= intval($item['quantity']) ?>" min="0" style="width:70px;padding:6px;border-radius:4px;border:1px solid #ccc;">
+          <?php $stock = get_available_stock($item['id'], $conn); ?>
+          <input type="number" name="quantities[<?= htmlspecialchars($item['id'], ENT_QUOTES) ?>]" value="<?= intval($item['quantity']) ?>" min="0" max="<?= $stock ?>" style="width:70px;padding:6px;border-radius:4px;border:1px solid #ccc;" title="Maximum available: <?= $stock ?>">
+          <div style="font-size:0.85rem;color:#666;margin-top:4px;">Stock: <?= $stock ?></div>
         </td>
         <td>$<?= number_format($subtotal, 2) ?></td>
         <td>

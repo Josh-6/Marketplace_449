@@ -1,5 +1,5 @@
 <?php
-// make sure to fetch products with pagination and category filter not fetch once at the page cache loading
+require_once __DIR__ . '/../backend/cartControl.php';
 
 // Ensure session is started so login state (e.g., $_SESSION['username']) is available
 if (session_status() === PHP_SESSION_NONE) {
@@ -172,6 +172,8 @@ $totalPages = $totalItems > 0 ? ceil($totalItems / $itemsPerPage) : 1;
       <?php else: ?>
         <?php if ($qty < 10): ?>
           <div class="low-stock">Only <?= htmlspecialchars($qty) ?> left!</div>
+        <?php else: ?>
+          <div class="in-stock">In Stock: <?= htmlspecialchars($qty) ?> left</div>
         <?php endif; ?>
         <form method="post" action="cart.php?action=add" style="margin-top:10px;display:flex;justify-content:center;gap:8px;align-items:center;">
           <input type="hidden" name="id" value="<?= htmlspecialchars($p['Item_ID'], ENT_QUOTES) ?>">
@@ -180,7 +182,7 @@ $totalPages = $totalItems > 0 ? ceil($totalItems / $itemsPerPage) : 1;
           <input type="hidden" name="seller_id" value="<?= htmlspecialchars($p['Seller_ID'], ENT_QUOTES) ?>">
           <input type="hidden" name="description" value="<?= htmlspecialchars($p['Item_Description'], ENT_QUOTES) ?>">
           <label style="font-size:0.9rem;">Qty
-            <input type="number" name="quantity" min="1" max="<?= $qty ?>" value="1" style="width:60px;padding:6px;border-radius:4px;border:1px solid #ccc;">
+            <input class="quantity" type="number" name="quantity" min="1" max="<?= $qty ?>" value="1" style="width:60px;padding:6px;border-radius:4px;border:1px solid #ccc;">
           </label>
           <button type="submit">Add to Cart</button>
         </form>
