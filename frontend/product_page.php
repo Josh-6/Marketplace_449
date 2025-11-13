@@ -1,35 +1,53 @@
 <?php
+require_once __DIR__ . '/../backend/cartControl.php';
+
 // Ensure session is started so login state (e.g., $_SESSION['username']) is available
 if (session_status() === PHP_SESSION_NONE) {
   session_start();
 }
 
-// load product array from backend
-include __DIR__ . '/../backend/product.php'; // load product array
+// Include database connection
+require_once __DIR__ . '/../database/db_connect.php';
+$conn = get_db_connection();
 
 // Category filter: optional ?category=Electronics
 $selectedCategory = isset($_GET['category']) ? trim($_GET['category']) : '';
-if ($selectedCategory !== '') {
-  // Basic sanitization - allow letters, numbers, spaces, and ampersand
-  $selectedCategory = preg_replace('/[^\w\s&-]/', '', $selectedCategory);
-  // Filter products by category (case-insensitive)
-  $filtered = array_filter($products, function($p) use ($selectedCategory) {
-    return isset($p['category']) && strcasecmp($p['category'], $selectedCategory) === 0;
-  });
-  $productsToShow = array_values($filtered);
-} else {
-  $productsToShow = $products;
-}
+$selectedCategory = preg_replace('/[^\w\s&-]/', '', $selectedCategory);
 
 // Pagination logic
 $itemsPerPage = 12;
-$totalItems = count($productsToShow);
-$totalPages = $totalItems > 0 ? ceil($totalItems / $itemsPerPage) : 1;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 if ($page < 1) $page = 1;
-$start = ($page - 1) * $itemsPerPage;
-$paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
+$offset = ($page - 1) * $itemsPerPage;
+
+// Prepare the base SQL query
+$countQuery = "SELECT COUNT(*) as total FROM Marketplace.Item";
+$productsQuery = "SELECT i.*, u.Username as seller_name 
+                 FROM Marketplace.Item i 
+                 LEFT JOIN Marketplace.Seller s ON i.Seller_ID = s.Seller_ID 
+                 LEFT JOIN Marketplace.Users u ON s.Seller_ID = u.User_ID";
+
+// Add category filter if specified
+if ($selectedCategory !== '') {
+    $countQuery .= " WHERE Item_Tags LIKE ?";
+    $productsQuery .= " WHERE Item_Tags LIKE ?";
+    $categoryParam = "%$selectedCategory%";
+}
+
+// Get total count for pagination
+$stmt = $conn->prepare($countQuery);
+if ($selectedCategory !== '') {
+    $stmt->bind_param("s", $categoryParam);
+}
+$stmt->execute();
+$totalResult = $stmt->get_result()->fetch_assoc();
+$totalItems = $totalResult['total'];
+$totalPages = $totalItems > 0 ? ceil($totalItems / $itemsPerPage) : 1;
+
+
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -98,7 +116,7 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
       <ul>
         <li><a href="index.php">Home</a></li>
         <li><a href="product_page.php">Products</a></li>
-        <li><a href="#">Categories</a></li>
+        <!-- <li><a href="#">Categories</a></li> -->
         <li><a href="upload_item.php">Sell Item</a></li>
         <li><a href="#">About</a></li>
         <li><a href="#">Contact Us</a></li>
@@ -127,29 +145,44 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
     <h2 style="margin:0;padding:0;"><?php echo $selectedCategory !== '' ? htmlspecialchars($selectedCategory) : 'All Products'; ?></h2>
   </div>
   
-  <?php foreach ($paginatedProducts as $p): ?>
+  <?php
+    // Get paginated products
+  $productsQuery .= " LIMIT ? OFFSET ?";
+  $stmt = $conn->prepare($productsQuery);
+  if ($selectedCategory !== '') {
+      $stmt->bind_param("sii", $categoryParam, $itemsPerPage, $offset);
+  } else {
+      $stmt->bind_param("ii", $itemsPerPage, $offset);
+  }
+  $stmt->execute();
+  $paginatedProducts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);      // Fetch as associative array is wrongly placed as cannot be updated when adding new products
+ 
+  foreach ($paginatedProducts as $p): ?>
     <div class="product-card">
-      <img src="<?= htmlspecialchars($p['image']) ?>" alt="<?= htmlspecialchars($p['name']) ?>">
-      <h3><?= htmlspecialchars($p['name']) ?></h3>
-      <p><?= htmlspecialchars($p['description']) ?></p>
-      <div class="price">$<?= htmlspecialchars($p['price']) ?></div>
+      <img src="images/products/<?= htmlspecialchars($p['Item_ID']) ?>.jpg" alt="<?= htmlspecialchars($p['Item_Name']) ?>">
+      <h3><?= htmlspecialchars($p['Item_Name']) ?></h3>
+      <p><?= htmlspecialchars($p['Item_Description']) ?></p>
+      <p><small>Sold by: <?= htmlspecialchars($p['seller_name']) ?></small></p>
+      <div class="price">$<?= htmlspecialchars(number_format($p['Item_Price'], 2)) ?></div>
 
-      <?php $qty = isset($p['quantity']) ? (int)$p['quantity'] : 0; ?>
+      <?php $qty = (int)$p['Item_Quantity']; ?>
       <?php if ($qty <= 0): ?>
         <div class="sold-out-overlay">Sold Out</div>
         <button disabled style="background:#ccc;cursor:not-allowed;">Sold Out</button>
       <?php else: ?>
         <?php if ($qty < 10): ?>
           <div class="low-stock">Only <?= htmlspecialchars($qty) ?> left!</div>
+        <?php else: ?>
+          <div class="in-stock">In Stock: <?= htmlspecialchars($qty) ?> left</div>
         <?php endif; ?>
         <form method="post" action="cart.php?action=add" style="margin-top:10px;display:flex;justify-content:center;gap:8px;align-items:center;">
-          <input type="hidden" name="id" value="<?= htmlspecialchars($p['id'], ENT_QUOTES) ?>">
-          <input type="hidden" name="name" value="<?= htmlspecialchars($p['name'], ENT_QUOTES) ?>">
-          <input type="hidden" name="price" value="<?= htmlspecialchars($p['price'], ENT_QUOTES) ?>">
-          <input type="hidden" name="image" value="<?= htmlspecialchars($p['image'], ENT_QUOTES) ?>">
-          <input type="hidden" name="description" value="<?= htmlspecialchars($p['description'], ENT_QUOTES) ?>">
+          <input type="hidden" name="id" value="<?= htmlspecialchars($p['Item_ID'], ENT_QUOTES) ?>">
+          <input type="hidden" name="name" value="<?= htmlspecialchars($p['Item_Name'], ENT_QUOTES) ?>">
+          <input type="hidden" name="price" value="<?= htmlspecialchars($p['Item_Price'], ENT_QUOTES) ?>">
+          <input type="hidden" name="seller_id" value="<?= htmlspecialchars($p['Seller_ID'], ENT_QUOTES) ?>">
+          <input type="hidden" name="description" value="<?= htmlspecialchars($p['Item_Description'], ENT_QUOTES) ?>">
           <label style="font-size:0.9rem;">Qty
-            <input type="number" name="quantity" min="1" max="<?= $qty ?>" value="1" style="width:60px;padding:6px;border-radius:4px;border:1px solid #ccc;">
+            <input class="quantity" type="number" name="quantity" min="1" max="<?= $qty ?>" value="1" style="width:60px;padding:6px;border-radius:4px;border:1px solid #ccc;">
           </label>
           <button type="submit">Add to Cart</button>
         </form>
@@ -169,6 +202,12 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
     <a href="?page=<?= $page + 1 ?>">Next &raquo;</a>
   <?php endif; ?>
 </div>
+
+<?php
+// Close the database connection
+$stmt->close();
+$conn->close();
+?>
 
 <footer>
   <p style="text-align:center;margin-top:20px;">&copy; 2025 Marketplace. All Rights Reserved.</p>

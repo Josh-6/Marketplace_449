@@ -1,12 +1,10 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-  session_start();
-}
+require_once __DIR__ . '/../backend/cartControl.php';
+require_once __DIR__ . '/../database/db_connect.php';
 
-include __DIR__ . '/../database/db_connect.php'; // your DB connection
+session_start();
 
 $conn = get_db_connection();
-//echo 'console.log("Database connected!")';
 
 // initialize cart in session if missing
 if (!isset($_SESSION['cart'])) {
@@ -24,95 +22,9 @@ function find_cart_index($id)
 }
 
 $total = 0.0;
-
-// Handle actions: add, update, remove
 $action = $_GET['action'] ?? '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  if ($action === 'add') {
-    $id = $_POST['id'] ?? '';
-    $name = $_POST['name'] ?? '';
-    $price = floatval($_POST['price'] ?? 0);
-    $image = $_POST['image'] ?? '';
-    $description = $_POST['description'] ?? '';
-    $quantity = max(1, intval($_POST['quantity'] ?? 1));
+getAction($action);
 
-    // if item exists, increase qty, else push
-    $idx = find_cart_index($id);
-    if ($idx !== null) {
-      $_SESSION['cart'][$idx]['quantity'] += $quantity;
-    } else {
-      $_SESSION['cart'][] = [
-        'id' => $id,
-        'name' => $name,
-        'price' => $price,
-        'image' => $image,
-        'description' => $description,
-        'quantity' => $quantity,
-      ];
-    }
-
-    // add item as viewed in History
-    if (isset($_SESSION['user_id'])) {
-      $userId = $_SESSION['user_id'];
-
-      // Use prepared statement
-      $stmt = $conn->prepare("
-            INSERT INTO Marketplace.User_History
-            (User_ID, Item_ID, History_Type, Viewed_At)
-            VALUES (?, ?, 'view', NOW())
-        ");
-      $stmt->bind_param("ii", $userId, $id);
-      $stmt->execute();
-      echo "<script>console.log('Viewed Item ID $id for User ID $userId');</script>";
-      $stmt->close();
-    }
-
-    // redirect to avoid form resubmission
-    header('Location: cart.php');
-    exit;
-  }
-  // If a remove button was clicked (we use a named submit button), handle it first
-  if (!empty($_POST['remove'])) {
-    $id = $_POST['remove'];
-    $idx = find_cart_index($id);
-    if ($idx !== null) {
-      array_splice($_SESSION['cart'], $idx, 1);
-    }
-    header('Location: cart.php');
-    exit;
-  }
-
-  if ($action === 'update') {
-    // Update quantities
-    if (!empty($_POST['quantities']) && is_array($_POST['quantities'])) {
-      foreach ($_POST['quantities'] as $id => $q) {
-        $idx = find_cart_index($id);
-        if ($idx !== null) {
-          $q = max(0, intval($q));
-          if ($q === 0) {
-            // remove
-            array_splice($_SESSION['cart'], $idx, 1);
-          } else {
-            $_SESSION['cart'][$idx]['quantity'] = $q;
-          }
-        }
-      }
-    }
-    header('Location: cart.php');
-    exit;
-  }
-
-  // Backwards-compatible: if a dedicated remove form is used (not expected), support it
-  if ($action === 'remove') {
-    $id = $_POST['id'] ?? '';
-    $idx = find_cart_index($id);
-    if ($idx !== null) {
-      array_splice($_SESSION['cart'], $idx, 1);
-    }
-    header('Location: cart.php');
-    exit;
-  }
-}
 
 ?>
 <!DOCTYPE html>
@@ -160,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <ul>
         <li><a href="index.php">Home</a></li>
         <li><a href="product_page.php">Products</a></li>
-        <li><a href="#">Categories</a></li>
+        <!-- <li><a href="#">Categories</a></li> -->
         <li><a href="upload_item.php">Sell Item</a></li>
         <li><a href="#">About</a></li>
         <li><a href="#">Contact Us</a></li>
@@ -191,35 +103,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <?php else: ?>
     <table>
       <tr>
-        <th style="width:40%">Product</th>
-        <th>Price</th>
-        <th>Quantity</th>
-        <th>Subtotal</th>
-        <th>Action</th>
-      </tr>
-      <form method="post" action="cart.php?action=update">
-        <?php foreach ($cart as $item): ?>
-          <?php $subtotal = floatval($item['price']) * intval($item['quantity']);
-          $total += $subtotal; ?>
-          <tr>
-            <td style="text-align:left;">
-              <div style="display:flex;gap:12px;align-items:center;">
-                <?php if (!empty($item['image'])): ?>
-                  <img src="<?= htmlspecialchars($item['image']) ?>" alt="<?= htmlspecialchars($item['name']) ?>" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid #eee;">
-                <?php endif; ?>
-                <div>
-                  <strong><?= htmlspecialchars($item['name']) ?></strong>
-                  <div style="font-size:0.9rem;color:#555;"><?= htmlspecialchars($item['description']) ?></div>
-                </div>
-              </div>
-            </td>
-            <td>$<?= number_format(floatval($item['price']), 2) ?></td>
-            <td>
-              <input type="number" name="quantities[<?= htmlspecialchars($item['id'], ENT_QUOTES) ?>]" value="<?= intval($item['quantity']) ?>" min="0" style="width:70px;padding:6px;border-radius:4px;border:1px solid #ccc;">
-            </td>
-            <td>$<?= number_format($subtotal, 2) ?></td>
-            <td>
-              <!-- Use a named submit button so we avoid nested forms. The top-level POST handler
+        <td style="text-align:left;">
+          <div style="display:flex;gap:12px;align-items:center;">
+            <?php if (!empty($item['image'])): ?>
+              <img src="<?= htmlspecialchars($item['image']) ?>" alt="<?= htmlspecialchars($item['name']) ?>" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid #eee;">
+            <?php endif; ?>
+            <div>
+              <strong><?= htmlspecialchars($item['name']) ?></strong>
+              <div style="font-size:0.9rem;color:#555;"><?= htmlspecialchars($item['description']) ?></div>
+            </div>
+          </div>
+        </td>
+        <td>$<?= number_format(floatval($item['price']), 2) ?></td>
+        <td>
+          <?php $stock = get_available_stock($item['id'], $conn); ?>
+          <input type="number" name="quantities[<?= htmlspecialchars($item['id'], ENT_QUOTES) ?>]" value="<?= intval($item['quantity']) ?>" min="0" max="<?= $stock ?>" style="width:70px;padding:6px;border-radius:4px;border:1px solid #ccc;" title="Maximum available: <?= $stock ?>">
+          <div style="font-size:0.85rem;color:#666;margin-top:4px;">Stock: <?= $stock ?></div>
+        </td>
+        <td>$<?= number_format($subtotal, 2) ?></td>
+        <td>
+          <!-- Use a named submit button so we avoid nested forms. The top-level POST handler
                will look for $_POST['remove'] and remove the item. -->
               <button type="submit" name="remove" value="<?= htmlspecialchars($item['id'], ENT_QUOTES) ?>" style="background:#b71c1c;">Remove</button>
             </td>

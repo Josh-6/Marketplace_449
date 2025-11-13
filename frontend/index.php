@@ -5,17 +5,14 @@ $servername = "localhost";
 $username = "root";
 $password = "";
 
-$conn = new mysqli($servername, $username, $password);
-if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
-}
+require_once __DIR__ . '/../database/db_connect.php';
+
+$conn = get_db_connection();
+
 
 //check session for user login status
 session_start();
-// Example: for testing, uncomment the next line to simulate a logged-in user
-// $_SESSION['username'] = "Alejandro";
-// $_SESSION['username'] = "Josh";
-// $_SESSION['username'] = "Tony";
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,7 +34,7 @@ session_start();
       <ul>
         <li><a href="index.php">Home</a></li>
         <li><a href="product_page.php">Products</a></li>
-        <li><a href="#">Categories</a></li>
+        <!-- <li><a href="#">Categories</a></li> -->
         <li><a href="upload_item.php">Sell Item</a></li>
         <li><a href="#">About</a></li>
         <li><a href="#">Contact Us</a></li>
@@ -67,7 +64,7 @@ session_start();
       <?php if (isset($_SESSION['username'])): ?>
         <h1>Welcome back, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
         <p>Here are some recommendations for you.</p>
-        <button>Shop Now</button>
+        <!-- <button>Shop Now</button> -->
       <?php else: ?>
         <h1>Exclusive Deals</h1>
         <p>Explore different categories. Find the best deals.</p>
@@ -123,24 +120,40 @@ session_start();
 
     <h2>Featured Products</h2>
     <div class="product-grid" id="product-grid">
-      <!-- Products will be loaded here In the mean time later on we can use js to load more products-->
       <?php
-      $query = "SELECT Item_ID, Item_Name, Item_Description, Item_Price, Item_Tags, Item_Quantity FROM Marketplace.Item LIMIT 6";
+      $query = "SELECT Item_ID, Item_Name, Item_Price, Item_Description,Seller_ID, Item_Quantity FROM Marketplace.Item LIMIT 6";
       $result = mysqli_query($conn, $query);
-      if ($result) {
-        while ($row = mysqli_fetch_assoc($result)) {
-          echo '<div class="product-card">';
-          echo '<img src="images/product_placeholder.png" alt="' . htmlspecialchars($row['Item_Name']) . ' image">'; // Placeholder image
-          echo '<h3>' . htmlspecialchars($row['Item_Name']) . '</h3>';
-          echo '<p>' . htmlspecialchars($row['Item_Description']) . '</p>';
-          echo '<p>$' . number_format($row['Item_Price'], 2) . '</p>';
-          echo '<button>Add to Cart</button>';
-          echo '</div>';
-        }
-      } else {
-        echo "<p>Error loading products: " . mysqli_error($conn) . "</p>";
-      }
-      ?>
+      foreach ($result as $p): ?>
+        <div class="product-card">
+          <img src="images/products/<?= htmlspecialchars($p['Item_ID']) ?>.jpg" alt="<?= htmlspecialchars($p['Item_Name']) ?>">
+          <h3><?= htmlspecialchars($p['Item_Name']) ?></h3>
+          <p><?= htmlspecialchars($p['Item_Description']) ?></p>
+          <div class="price">$<?= htmlspecialchars(number_format($p['Item_Price'], 2)) ?></div>
+
+          <?php $qty = (int)$p['Item_Quantity']; ?>
+          <?php if ($qty <= 0): ?>
+            <div class="sold-out-overlay">Sold Out</div>
+            <button disabled style="background:#ccc;cursor:not-allowed;">Sold Out</button>
+          <?php else: ?>
+            <?php if ($qty < 10): ?>
+              <div class="low-stock">Only <?= htmlspecialchars($qty) ?> left!</div>
+            <?php else: ?>
+              <div class="in-stock">In Stock: <?= htmlspecialchars($qty) ?> left</div>
+            <?php endif; ?>
+            <form method="post" action="cart.php?action=add">
+              <input type="hidden" name="id" value="<?= htmlspecialchars($p['Item_ID'], ENT_QUOTES) ?>">
+              <input type="hidden" name="name" value="<?= htmlspecialchars($p['Item_Name'], ENT_QUOTES) ?>">
+              <input type="hidden" name="price" value="<?= htmlspecialchars($p['Item_Price'], ENT_QUOTES) ?>">
+              <input type="hidden" name="seller_id" value="<?= htmlspecialchars($p['Seller_ID'], ENT_QUOTES) ?>">
+              <input type="hidden" name="description" value="<?= htmlspecialchars($p['Item_Description'], ENT_QUOTES) ?>">
+              <label style="font-size:0.9rem;">Qty
+                <input class="quantity" type="number" name="quantity" min="1" max="<?= $p['Item_Quantity'] ?>" value="1" style="width:60px;padding:6px;border-radius:4px;border:1px solid #ccc;">
+              </label>
+              <button type="submit">Add to Cart</button>
+            </form>
+          <?php endif; ?>
+        </div>
+      <?php endforeach; ?>
     </div>
   </section>
 
@@ -148,22 +161,39 @@ session_start();
     <div class="product-grid" id="product-grid">
       <!-- Products will be loaded here In the mean time later on we can use js to load more products-->
       <?php
-      $query = "SELECT * FROM Marketplace.new_products";
+      $query = "SELECT * FROM Marketplace.new_products LIMIT 10";
       $result = mysqli_query($conn, $query);
-      if ($result) {
-        while ($row = mysqli_fetch_assoc($result)) {
-          echo '<div class="product-card">';
-          echo '<img src="images/product_placeholder.png" alt="' . htmlspecialchars($row['Item_Name']) . ' image">'; // Placeholder image
-          echo '<h3>' . htmlspecialchars($row['Item_Name']) . '</h3>';
-          echo '<p>' . htmlspecialchars($row['Item_Description']) . '</p>';
-          echo '<p>$' . number_format($row['Item_Price'], 2) . '</p>';
-          echo '<button>Add to Cart</button>';
-          echo '</div>';
-        }
-      } else {
-        echo "<p>Error loading products: " . mysqli_error($conn) . "</p>";
-      }
-      ?>
+      foreach ($result as $p): ?>
+        <div class="product-card">
+          <img src="images/products/<?= htmlspecialchars($p['Item_ID']) ?>.jpg" alt="<?= htmlspecialchars($p['Item_Name']) ?>">
+          <h3><?= htmlspecialchars($p['Item_Name']) ?></h3>
+          <p><?= htmlspecialchars($p['Item_Description']) ?></p>
+          <div class="price">$<?= htmlspecialchars(number_format($p['Item_Price'], 2)) ?></div>
+
+          <?php $qty = (int)$p['Item_Quantity']; ?>
+          <?php if ($qty <= 0): ?>
+            <div class="sold-out-overlay">Sold Out</div>
+            <button disabled style="background:#ccc;cursor:not-allowed;">Sold Out</button>
+          <?php else: ?>
+            <?php if ($qty < 10): ?>
+              <div class="low-stock">Only <?= htmlspecialchars($qty) ?> left!</div>
+            <?php else: ?>
+              <div class="in-stock">In Stock: <?= htmlspecialchars($qty) ?> left</div>
+            <?php endif; ?>
+            <form method="post" action="cart.php?action=add">
+              <input type="hidden" name="id" value="<?= htmlspecialchars($p['Item_ID'], ENT_QUOTES) ?>">
+              <input type="hidden" name="name" value="<?= htmlspecialchars($p['Item_Name'], ENT_QUOTES) ?>">
+              <input type="hidden" name="price" value="<?= htmlspecialchars($p['Item_Price'], ENT_QUOTES) ?>">
+              <input type="hidden" name="seller_id" value="<?= htmlspecialchars($p['Seller_ID'], ENT_QUOTES) ?>">
+              <input type="hidden" name="description" value="<?= htmlspecialchars($p['Item_Description'], ENT_QUOTES) ?>">
+              <label style="font-size:0.9rem;">Qty
+                <input class="quantity" type="number" name="quantity" min="1" max="<?= $p['Item_Quantity'] ?>" value="1" style="width:60px;padding:6px;border-radius:4px;border:1px solid #ccc;">
+              </label>
+              <button type="submit">Add to Cart</button>
+            </form>
+          <?php endif; ?>
+        </div>
+      <?php endforeach; ?>
     </div>
   </section>
 
