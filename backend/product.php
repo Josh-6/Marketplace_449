@@ -14,7 +14,7 @@ $products = [
     "name" => "Wireless Headphones",
     "description" => "Noise-cancelling Bluetooth headphones",
     "price" => "199.00",
-    "image" => "/CSCP 386/beauty.jpg",
+    "image" => "images/beauty.jpg",
     "quantity" => 10,
     "category" => "Electronics"
   ],

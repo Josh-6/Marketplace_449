@@ -22,7 +22,7 @@ session_start();
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Marketplace - eCommerce Home Page</title>
   <!-- Correct CSS path -->
-  <link rel="stylesheet" href="css/style.css?v=1" /><!-- If stylesheet changes notrelected increment number -->
+  <link rel="stylesheet" href="css/style.css?v=2" /><!-- If stylesheet changes notrelected increment number -->
 </head>
 
 <body>
