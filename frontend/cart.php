@@ -99,9 +99,19 @@ getAction($action);
   <h2 style="text-align:center; margin-top:30px;">Your Shopping Cart</h2>
 
   <?php if (empty($cart)): ?>
-    <p style="text-align:center;">Your cart is empty.</p>
-  <?php else: ?>
-    <table>
+  <p style="text-align:center;">Your cart is empty.</p>
+<?php else: ?>
+  <table>
+    <tr>
+      <th style="width:40%">Product</th>
+      <th>Price</th>
+      <th>Quantity</th>
+      <th>Subtotal</th>
+      <th>Action</th>
+    </tr>
+    <form method="post" action="cart.php?action=update">
+    <?php foreach ($cart as $item): ?>
+      <?php $subtotal = floatval($item['price']) * intval($item['quantity']); $total += $subtotal; ?>
       <tr>
         <td style="text-align:left;">
           <div style="display:flex;gap:12px;align-items:center;">
@@ -124,34 +134,33 @@ getAction($action);
         <td>
           <!-- Use a named submit button so we avoid nested forms. The top-level POST handler
                will look for $_POST['remove'] and remove the item. -->
-              <button type="submit" name="remove" value="<?= htmlspecialchars($item['id'], ENT_QUOTES) ?>" style="background:#b71c1c;">Remove</button>
-            </td>
-          </tr>
-        <?php endforeach; ?>
-        <tr>
-          <td colspan="5" style="text-align:right;">
-            <button type="submit">Update Cart</button>
-          </td>
-        </tr>
-      </form>
-      <!-- end update form -->
-
-
-      <tr>
-        <th colspan="3" style="text-align:right;">Total:</th>
-        <th colspan="2">$<?= number_format($total, 2) ?></th>
-      </tr>
-      <tr>
-        <td colspan="5" style="text-align:right;">
-          <!-- Checkout button: non-nested, links to the checkout page -->
-          <a href="checkout.php" style="display:inline-block;background:#00796b;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none;">Proceed to Payment</a>
+          <button type="submit" name="remove" value="<?= htmlspecialchars($item['id'], ENT_QUOTES) ?>" style="background:#b71c1c;">Remove</button>
         </td>
       </tr>
-    </table>
+    <?php endforeach; ?>
+    <tr>
+      <td colspan="5" style="text-align:right;">
+        <button type="submit">Update Cart</button>
+      </td>
+    </tr>
+    </form>
+    <!-- end update form -->
 
 
-  <?php endif; ?>
+    <tr>
+      <th colspan="3" style="text-align:right;">Total:</th>
+      <th colspan="2">$<?= number_format($total, 2) ?></th>
+    </tr>
+          <tr>
+      <td colspan="5" style="text-align:right;">
+        <!-- Checkout button: non-nested, links to the checkout page -->
+        <a href="checkout.php" style="display:inline-block;background:#00796b;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none;">Proceed to Payment</a>
+      </td>
+    </tr>
+  </table>
+
+
+<?php endif; ?>
 
 </body>
-
 </html>
