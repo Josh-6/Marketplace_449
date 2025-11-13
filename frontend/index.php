@@ -11,7 +11,7 @@ if ($conn->connect_error) {
 }
 
 //check session for user login status
-// session_start();
+session_start();
 // Example: for testing, uncomment the next line to simulate a logged-in user
 // $_SESSION['username'] = "Alejandro";
 // $_SESSION['username'] = "Josh";
@@ -31,23 +31,23 @@ if ($conn->connect_error) {
 <body>
 
   <!-- Navbar -->
-  <header>
+<header>
     <div class="logo">Marketplace</div>
     <nav>
       <ul>
         <li><a href="index.php">Home</a></li>
-        <li><a href="product.php">Products</a></li>
+        <li><a href="product_page.php">Products</a></li>
         <li><a href="#">Categories</a></li>
         <li><a href="#">About</a></li>
         <li><a href="#">Contact Us</a></li>
         <li class="dropdown">
-          <?php if (isset($_SESSION['username'])): ?>
+              <?php if (isset($_SESSION['username'])): ?>
             <a href="#">Hello, <?php echo htmlspecialchars($_SESSION['username']); ?></a>
             <div class="dropdown-menu">
               <a href="#">Profile</a>
               <a href="#">History</a>
               <a href="#">Orders</a>
-              <a href="index.php">Sign Out</a>
+                  <a href="../backend/logout.php">Sign Out</a>
             </div>
           <?php else: ?>
             <a href="signin.php">Hello, Sign in</a>
@@ -56,7 +56,7 @@ if ($conn->connect_error) {
       </ul>
     </nav>
     <div class="icons">
-      🔍 🛒
+      🔍 <a href="cart.php" style="text-decoration:none;color:inherit;">🛒 Cart (<?php echo isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0; ?>)</a>
     </div>
   </header>
 
@@ -81,28 +81,40 @@ if ($conn->connect_error) {
     <h2>Explore by Category</h2>
     <div class="category-grid">
       <div class="category-card">
-        <img src="images/electronics.jpg" alt="Electronics">
-        <span>Electronics</span>
+        <a href="product_page.php?category=Electronics" style="text-decoration:none;color:inherit;display:block;">
+          <img src="images/electronics.jpg" alt="Electronics">
+          <span>Electronics</span>
+        </a>
       </div>
       <div class="category-card">
-        <img src="images/furniture.jpg" alt="Furniture">
-        <span>Furniture</span>
+        <a href="product_page.php?category=Furniture" style="text-decoration:none;color:inherit;display:block;">
+          <img src="images/furniture.jpg" alt="Furniture">
+          <span>Furniture</span>
+        </a>
       </div>
       <div class="category-card">
-        <img src="images/food2.webp" alt="Food">
-        <span>Food</span>
+        <a href="product_page.php?category=Food" style="text-decoration:none;color:inherit;display:block;">
+          <img src="images/food2.webp" alt="Food">
+          <span>Food</span>
+        </a>
       </div>
       <div class="category-card">
-        <img src="images/beauty.jpg" alt="Beauty">
-        <span>Beauty and Personal Care</span>
+        <a href="product_page.php?category=Beauty%20and%20Personal%20Care" style="text-decoration:none;color:inherit;display:block;">
+          <img src="images/beauty.jpg" alt="Beauty">
+          <span>Beauty and Personal Care</span>
+        </a>
       </div>
       <div class="category-card">
-        <img src="images/fashion2.webp" alt="Fashion">
-        <span>Fashion and Apparel</span>
+        <a href="product_page.php?category=Fashion%20and%20Apparel" style="text-decoration:none;color:inherit;display:block;">
+          <img src="images/fashion2.webp" alt="Fashion">
+          <span>Fashion and Apparel</span>
+        </a>
       </div>
       <div class="category-card">
-        <img src="images/toy.webp" alt="Toy">
-        <span>Toy and Hobbies</span>
+        <a href="product_page.php?category=Toy%20and%20Hobbies" style="text-decoration:none;color:inherit;display:block;">
+          <img src="images/toy.webp" alt="Toy">
+          <span>Toy and Hobbies</span>
+        </a>
       </div>
     </div>
   </section>
