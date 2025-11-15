@@ -26,10 +26,12 @@ $offset = ($page - 1) * $itemsPerPage;
 
 // Prepare the base SQL query
 $countQuery = "SELECT COUNT(*) as total FROM Marketplace.Item WHERE 1=1";
-$productsQuery = "SELECT i.*, u.Username as seller_name 
+$productsQuery = "SELECT i.*, u.Username as seller_name,
+                        AVG(r.Review_Rating) as avg_rating, COUNT(r.Review_ID) as review_count
                  FROM Marketplace.Item i 
                  LEFT JOIN Marketplace.Seller s ON i.Seller_ID = s.Seller_ID 
                  LEFT JOIN Marketplace.Users u ON s.Seller_ID = u.User_ID
+                 LEFT JOIN Marketplace.Review r ON i.Item_ID = r.Item_ID
                  WHERE 1=1";
 
 $params = [];
@@ -228,7 +230,7 @@ $totalPages = $totalItems > 0 ? ceil($totalItems / $itemsPerPage) : 1;
   
   <?php
     // Get paginated products
-  $productsQuery .= " ORDER BY Added_On DESC LIMIT ? OFFSET ?";
+  $productsQuery .= " GROUP BY i.Item_ID ORDER BY i.Added_On DESC LIMIT ? OFFSET ?";
   $stmt = $conn->prepare($productsQuery);
   
   // Add pagination parameters
@@ -265,10 +267,29 @@ $totalPages = $totalItems > 0 ? ceil($totalItems / $itemsPerPage) : 1;
     if (!file_exists($imagePath)) {
       $imagePath = "images/products/default.jpg";
     }
+    $rating = $p['avg_rating'] ? round($p['avg_rating'], 1) : 0;
   ?>
     <div class="product-card">
-      <img src="<?= $imagePath ?>" alt="<?= htmlspecialchars($p['Item_Name']) ?>" onerror="this.src='images/products/default.jpg'">
-      <h3><?= htmlspecialchars($p['Item_Name']) ?></h3>
+      <a href="product_detail.php?id=<?= htmlspecialchars($p['Item_ID']) ?>" style="text-decoration:none;color:inherit;">
+        <img src="<?= $imagePath ?>" alt="<?= htmlspecialchars($p['Item_Name']) ?>" onerror="this.src='images/products/default.jpg'">
+        <h3><?= htmlspecialchars($p['Item_Name']) ?></h3>
+        <div class="product-rating" style="margin: 8px 0; display: flex; align-items: center; gap: 5px; justify-content: center;">
+          <div class="stars" style="display: flex; gap: 1px;">
+            <?php 
+            for ($i = 1; $i <= 5; $i++) {
+              if ($i <= floor($rating)) {
+                echo '<span style="color: #ffd700; font-size: 0.9rem;">★</span>';
+              } else {
+                echo '<span style="color: #ddd; font-size: 0.9rem;">★</span>';
+              }
+            }
+            ?>
+          </div>
+          <span style="font-size: 0.8rem; color: #666;">
+            <?= $p['review_count'] ? '(' . $p['review_count'] . ')' : '(0)' ?>
+          </span>
+        </div>
+      </a>
       <p><?= htmlspecialchars($p['Item_Description']) ?></p>
       <p><small>Sold by: <?= htmlspecialchars($p['seller_name']) ?></small></p>
       <div class="price">$<?= htmlspecialchars(number_format($p['Item_Price'], 2)) ?></div>
