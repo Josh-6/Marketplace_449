@@ -248,6 +248,129 @@ nav ul li a:hover {
     background: #004d40;
 }
 
+/* Chatbot Section */
+.chatbot-section {
+    padding: 60px 10%;
+    background: #f6f9f8;
+    text-align: center;
+}
+
+.chatbot-section h2 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: #093028;
+}
+
+.chatbot-section p {
+    color: #555;
+    margin-bottom: 30px;
+    font-size: 1rem;
+}
+
+.chatbot-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 500px;
+}
+
+.chatbot-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: #fff;
+}
+
+.message {
+    margin-bottom: 15px;
+    display: flex;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.user-message {
+    justify-content: flex-end;
+}
+
+.user-message p {
+    background: #00695c;
+    color: #fff;
+    padding: 12px 15px;
+    border-radius: 10px;
+    max-width: 80%;
+    word-wrap: break-word;
+    text-align: left;
+}
+
+.bot-message {
+    justify-content: flex-start;
+}
+
+.bot-message p {
+    background: #e8f5e9;
+    color: #093028;
+    padding: 12px 15px;
+    border-radius: 10px;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.chatbot-form {
+    display: flex;
+    gap: 10px;
+    padding: 15px;
+    background: #f9f9f9;
+    border-top: 1px solid #eee;
+}
+
+.chatbot-form input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.95rem;
+}
+
+.chatbot-form input:focus {
+    outline: none;
+    border-color: #00695c;
+    box-shadow: 0 0 5px rgba(0, 105, 92, 0.3);
+}
+
+.chatbot-form button {
+    background: #00695c;
+    color: #fff;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.chatbot-form button:hover {
+    background: #004d40;
+}
+
+.chatbot-form button:active {
+    transform: scale(0.98);
+}
 
 
 /* Footer */
