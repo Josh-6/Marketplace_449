@@ -3,19 +3,46 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
+/*echo '<pre>';
+var_dump($_SESSION); // Checking session variables
+echo '</pre>';*/
 // Ensure user is logged in
 /*
 
 }*/
 
-include __DIR__ . '/../database/db_connect.php'; // your DB connection
+require_once __DIR__ . '/../database/db_connect.php'; // DB connection
 
 $conn = get_db_connection();
 //echo 'console.log("Database connected!")';
 
 $userId = $_SESSION['user_id'] ?? 0;
 
+if ($userId) {
+    $stmt = $conn->prepare("
+    SELECT 
+        u.User_Email,
+        u.Full_Name,
+        s.Seller_Phone_Number,
+        s.Seller_Location
+    FROM Users u
+    LEFT JOIN Seller s ON s.Seller_ID = u.User_ID
+    WHERE u.User_ID = ?
+");
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($row = $result->fetch_assoc()) {
+    $sessionEmail = $row['User_Email'] ?? 'Unknown';
+    $sessionFullName = $row['Full_Name'] ?? null;
+    $sessionPhone = $row['Seller_Phone_Number'] ?? null;
+    $sessionAddress = $row['Seller_Location'] ?? null;
+}
+    $stmt->close();
+}
+$sessionUsername = $_SESSION['username'] ?? 'Unknown';
+$isSeller = !empty($_SESSION['seller_registered']);
 
 // Fetch Item History (20 most recent)
 $stmt1 = $conn->prepare("
@@ -68,6 +95,7 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
     <link rel="stylesheet" href="css/profile.css?v=2" /><!-- If stylesheet changes notrelected increment number -->
 </head>
 
+<!-- Nav Bar -->
 <header>
     <div class="logo">Marketplace</div>
     <nav>
@@ -109,7 +137,7 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
 
         <!-- User Info -->
         <div class="profile-info">
-            <h2 class="username"><?php echo htmlspecialchars($_SESSION['username']); ?></h2>
+            <h2 class="username"><?php echo htmlspecialchars($sessionUsername); ?></h2>
             <p class="username-text">To change your username, visit</p>
             <a href="#" class="account-settings-link">Account settings</a>
         </div>
@@ -132,8 +160,10 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
     <button class="tab-button" data-tab="account-settings">Account Settings</button>
 </section>
 
-<!--Section 3 (Tab Content) -->
+<!-- Section 3 (Tab Content) -->
 <section class="profile-content">
+
+    <!-- Item History -->
     <div id="item-history" class="tab-content active">
         <div class="item-history-container">
             <?php if ($itemCount): ?>
@@ -151,6 +181,7 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
         </div>
     </div>
 
+    <!-- Order History -->
     <div id="order-history" class="tab-content">
         <div class="order-history-container">
             <?php if ($orderCount): ?>
@@ -174,17 +205,165 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
         </div>
     </div>
 
+    <!-- Account Settings -->
     <div id="account-settings" class="tab-content">
         <div class="account-settings-container">
-            <div class="empty-message">Account Settings</div>
-        </div>
-    </div>
+            <!-- Two-column layout, left is buttons, right  content -->
+            <div class="account-settings-grid">
+                <aside class="account-sidebar">
+                    <nav class="account-nav">
+                        <button class="account active" data-content="personal-information">Personal Information</button>
+                        <button class="account" data-content="payment-information">Payment Information</button>
+                        <button class="account" data-content="seller-information">Seller Information</button>
+                    </nav>
+                </aside>
 
+                <main class="account-main">
+                    <!-- PERSONAL INFORMATION -->
+                    <div id="personal-information" class="account-panel active">
+                        <!-- Username block -->
+                        <div class="info-block" data-block="username">
+                            <div class="info-label"><strong>Username</strong></div>
+                            <div class="info-value">
+                                <span class="display-value username-value"><?php echo htmlspecialchars($sessionUsername); ?></span>
+                                <div class="edit-controls">
+                                    <button class="edit-btn" data-edit="username">Edit</button>
+                                </div>
+                            </div>
+
+                            <!-- Edit form (hidden by default) -->
+                            <div class="edit-form" data-form="username" style="display:none;">
+                                <input type="text" name="username_input" class="input-username" value="<?php echo htmlspecialchars($sessionUsername); ?>">
+                                <div class="form-actions">
+                                    <button class="save-btn small" data-save="username">Save</button>
+                                    <button class="cancel-btn small" data-cancel="username">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Account type block -->
+                        <div class="info-block" data-block="account-type">
+                            <div class="info-label"><strong>Account Type</strong></div>
+                            <div class="info-value">
+                                <span class="display-value account-type-value">
+                                    <?php echo $isSeller ? 'Buyer &amp; Seller' : 'Buyer'; ?>
+                                </span>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Contact Info -->
+                        <div class="info-block" data-block="contact">
+                            <div class="info-label"><strong>Contact Info</strong></div>
+                            <div class="info-value contact-info-value">
+                                <div class="phone-value">
+                                    <?php echo $sessionPhone ? htmlspecialchars($sessionPhone) : '<span class="no-info">No Phone Number</span>'; ?>
+                                </div>
+                                <div class="email-value">
+                                    <?php echo $sessionEmail ? htmlspecialchars($sessionEmail) : '<span class="no-info">No Email</span>'; ?>
+                                </div>
+                                <div class="edit-controls">
+                                    <button class="edit-btn" data-edit="contact">Edit</button>
+                                </div>
+                            </div>
+                            <div class="edit-form" data-form="contact" style="display:none;">
+                                <input type="text" name="phone_input" class="input-phone" value="<?php echo htmlspecialchars($sessionPhone ?? ''); ?>" placeholder="e.g. 555-123-4567">
+                                <input type="text" name="email_input" class="input-email" value="<?php echo htmlspecialchars($sessionEmail ?? ''); ?>" placeholder="e.g. JohnDoe@gmail.com">
+                                <div class="form-actions">
+                                    <button class="save-btn small" data-save="contact">Save</button>
+                                    <button class="cancel-btn small" data-cancel="contact">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Personal Info -->
+                        <div class="info-block" data-block="personal">
+                            <div class="info-label"><strong>Personal Info</strong></div>
+                            <div class="info-value personal-info-value">
+                                <div class="full-name">
+                                    <?php echo $sessionFullName ? htmlspecialchars($sessionFullName) : '<span class="no-info">No Name</span>'; ?>
+                                </div>
+                                <div class="address" style="margin-top:8px;">
+                                    <?php echo $sessionAddress ? nl2br(htmlspecialchars($sessionAddress)) : '<span class="no-info">No Address</span>'; ?>
+                                </div>
+                                <div class="edit-controls">
+                                    <button class="edit-btn" data-edit="personal">Edit</button>
+                                </div>
+                            </div>
+
+                            <div class="edit-form" data-form="personal" style="display:none;">
+                                <input type="text" name="full_name_input" class="input-fullname" value="<?php echo htmlspecialchars($sessionFullName ?? ''); ?>" placeholder="Full name">
+                                <textarea name="address_input" class="input-address" placeholder="Address"><?php echo htmlspecialchars($sessionAddress ?? ''); ?></textarea>
+                                <div class="form-actions">
+                                    <button class="save-btn small" data-save="personal">Save</button>
+                                    <button class="cancel-btn small" data-cancel="personal">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PAYMENT INFORMATION -->
+                    <div id="payment-information" class="account-panel">
+                        <div class="panel-heading"><strong>Payment Methods</strong></div>
+                        <div class="panel-body">
+                            <p class="muted">Add multiple payment methods. (Add / edit / remove functionality will be added later.)</p>
+                            <div class="payment-list">
+                                <!-- Placeholder items -->
+                                <div class="payment-item">Visa ending in 1234</div>
+                                <div class="payment-item">Mastercard ending in 9876</div>
+                            </div>
+
+                            <div style="margin-top:12px;">
+                                <button class="primary-btn" id="add-payment-btn">Add New Payment Method</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SELLER INFORMATION -->
+                    <div id="seller-information" class="account-panel">
+                        <div class="panel-heading"><strong>Items Listed</strong></div>
+                        <div class="panel-body">
+                            <?php if ($isSeller): ?>
+                                <p>Current listed items. (Listing management coming soon.)</p>
+                                <div class="seller-listing-placeholder">
+                                    <!-- example placeholder -->
+                                    <div class="listing-card">
+                                        <img src="images/placeholder.png" alt="Item" style="width:80px;height:80px;object-fit:cover;border-radius:6px;">
+                                        <div class="listing-info">
+                                            <div class="listing-title">Sample Item</div>
+                                            <div class="listing-price">$9.99</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php else: ?>
+                                <p>You are not registered as a seller.</p>
+                                <button class="primary-btn" id="become-seller-btn">Become a Seller</button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </main>
+            </div> <!-- end account-settings-grid -->
+        </div> <!-- end account-settings-container -->
+    </div> <!-- end account-settings tab -->
 </section>
 
-
-
 <!-- JS file -->
+<script>
+    // expose some PHP data for JS to use (read-only)
+    window.profileSession = {
+        username: <?php echo json_encode($sessionUsername); ?>,
+        email: <?php echo json_encode($sessionEmail); ?>,
+        fullName: <?php echo json_encode($sessionFullName); ?>,
+        phone: <?php echo json_encode($sessionPhone); ?>,
+        address: <?php echo json_encode($sessionAddress); ?>,
+        isSeller: <?php echo $isSeller ? 'true' : 'false'; ?>
+    };
+</script>
 <script src="js/profile.js"></script>
 
 </html>
