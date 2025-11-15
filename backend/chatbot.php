@@ -13,7 +13,7 @@ if (empty($prompt)) {
 
 // Sanitize input
 $prompt = trim($prompt);
-$prompt = addslashes($prompt);
+
 
 // Path to Python executable and script
 $python_exe = 'C:/xampp/htdocs/Marketplace_449/devEnv/Scripts/python.exe';
@@ -23,18 +23,16 @@ $python_script = __DIR__ . '/charModel.py';
 $temp_script = tempnam(sys_get_temp_dir(), 'chat_');
 $temp_script .= '.py';
 
-$python_code = <<<'PYTHON'
-import sys
-sys.path.insert(0, 'C:/xampp/htdocs/Marketplace_449/backend')
-from charModel import generate_text
-
-prompt = """ . json_encode($prompt) . """
-try:
-    response = generate_text(prompt)
-    print(response)
-except Exception as e:
-    print(f"Error: {str(e)}")
-PYTHON;
+$python_code =
+    "import sys\n"
+    . "sys.path.insert(0, 'C:/xampp/htdocs/Marketplace_449/backend')\n"
+    . "from charModel import generate_text\n\n"
+    . "prompt = " . json_encode($prompt) . "\n"
+    . "try:\n"
+    . "    response = generate_text(prompt)\n"
+    . "    print(response)\n"
+    . "except Exception as e:\n"
+    . "    print(f\"Error: {str(e)}\")\n";
 
 file_put_contents($temp_script, $python_code);
 

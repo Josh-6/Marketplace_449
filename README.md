@@ -20,31 +20,38 @@ Only need to install these components:
 - PHP
 - phpMyAdmin
 
-3. Open XAMPP Control Panel
+3. Open install the libraries inside requirements.txt
+- Optional but recomended: use a virtual environment to install the libraries and its dependencies to avoid error or clogging your pc.
+  - You can use: ``` python -m venv devEnv ```
+  - Next activate the virtual environment ``` devEnv\Scripts\activate ```
+  - Then install the dependencies
+- use pip install or any other method to install them.
+
+4. Open XAMPP Control Panel
 - Start Apache (For viewing in browser)
 - Start MySQL (For connecting to database)
 
-4. Find htdocs in XAMPP folder
+5. Find htdocs in XAMPP folder
 - Windows → C:\xampp\htdocs\
 - Mac → /Applications/XAMPP/htdocs/
 - Linux → /opt/lampp/htdocs/
   
-5. Move or copy Marketplace_449 to htdocs
+6. Move or copy Marketplace_449 to htdocs
 - Windows → C:\xampp\htdocs\Marketplace_449
 - Mac → /Applications/XAMPP/htdocs/Marketplace_449
 - Linux → /opt/lampp/htdocs/Marketplace_449
 
-6. Using XAMPP App
+7. Using XAMPP App
 - start the "Apache" module
 - start the "MySQL" Module
 
-7. Using any mySQL DBMS
+8. Using any mySQL DBMS
 - create a connection
 - copy the XAMPP port and add it on the set up option "Port"
 - set a password if needed
 - Optional - set a devide as a server so that it can be accessible by different collaborators. Needs to have further configuration...
 
-8. Go to your browser and visit
+9. Go to your browser and visit
 - (only the first time)
   ```bash
   http://localhost/marketplace_449/database/
