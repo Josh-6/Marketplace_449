@@ -14,6 +14,10 @@ $conn = get_db_connection();
 $selectedCategory = isset($_GET['category']) ? trim($_GET['category']) : '';
 $selectedCategory = preg_replace('/[^\w\s&-]/', '', $selectedCategory);
 
+// Search functionality
+$searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
+$searchTerm = preg_replace('/[^\w\s-]/', '', $searchTerm);
+
 // Pagination logic
 $itemsPerPage = 12;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -21,23 +25,39 @@ if ($page < 1) $page = 1;
 $offset = ($page - 1) * $itemsPerPage;
 
 // Prepare the base SQL query
-$countQuery = "SELECT COUNT(*) as total FROM Marketplace.Item";
+$countQuery = "SELECT COUNT(*) as total FROM Marketplace.Item WHERE 1=1";
 $productsQuery = "SELECT i.*, u.Username as seller_name 
                  FROM Marketplace.Item i 
                  LEFT JOIN Marketplace.Seller s ON i.Seller_ID = s.Seller_ID 
-                 LEFT JOIN Marketplace.Users u ON s.Seller_ID = u.User_ID";
+                 LEFT JOIN Marketplace.Users u ON s.Seller_ID = u.User_ID
+                 WHERE 1=1";
+
+$params = [];
+$paramTypes = '';
 
 // Add category filter if specified
 if ($selectedCategory !== '') {
-    $countQuery .= " WHERE Item_Tags LIKE ?";
-    $productsQuery .= " WHERE Item_Tags LIKE ?";
+    $countQuery .= " AND Item_Tags LIKE ?";
+    $productsQuery .= " AND Item_Tags LIKE ?";
     $categoryParam = "%$selectedCategory%";
+    $params[] = $categoryParam;
+    $paramTypes .= 's';
+}
+
+// Add search filter if specified
+if ($searchTerm !== '') {
+    $countQuery .= " AND (Item_Name LIKE ? OR Item_Description LIKE ?)";
+    $productsQuery .= " AND (Item_Name LIKE ? OR Item_Description LIKE ?)";
+    $searchParam = "%$searchTerm%";
+    $params[] = $searchParam;
+    $params[] = $searchParam;
+    $paramTypes .= 'ss';
 }
 
 // Get total count for pagination
 $stmt = $conn->prepare($countQuery);
-if ($selectedCategory !== '') {
-    $stmt->bind_param("s", $categoryParam);
+if (!empty($params)) {
+    $stmt->bind_param($paramTypes, ...$params);
 }
 $stmt->execute();
 $totalResult = $stmt->get_result()->fetch_assoc();
@@ -106,6 +126,31 @@ $totalPages = $totalItems > 0 ? ceil($totalItems / $itemsPerPage) : 1;
     }
     .pagination a.active { background: #00695c; color: white; }
     .pagination a:hover { background: #004d40; color: white; }
+    
+    .category-filter {
+      background: #f8f9fa; padding: 20px; margin: 20px 10%; border-radius: 10px;
+      display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center;
+    }
+    .category-filter h3 { margin: 0 15px 0 0; color: #00695c; }
+    .category-btn {
+      padding: 8px 15px; background: white; color: #00695c; 
+      border: 2px solid #00695c; border-radius: 20px; text-decoration: none;
+      transition: all 0.3s ease; font-size: 14px; font-weight: 500;
+    }
+    .category-btn:hover, .category-btn.active {
+      background: #00695c; color: white;
+    }
+    .search-bar {
+      margin: 20px 10%; text-align: center;
+    }
+    .search-bar input {
+      padding: 10px 15px; width: 300px; border: 2px solid #00695c;
+      border-radius: 25px; outline: none; font-size: 14px;
+    }
+    .search-bar button {
+      padding: 10px 20px; background: #00695c; color: white;
+      border: none; border-radius: 20px; margin-left: 10px; cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -140,26 +185,89 @@ $totalPages = $totalItems > 0 ? ceil($totalItems / $itemsPerPage) : 1;
     </div>
   </header>
 
+<!-- Category Filter Section -->
+<div class="category-filter">
+  <h3>Browse by Category:</h3>
+  <a href="product_page.php" class="category-btn <?php echo $selectedCategory === '' ? 'active' : ''; ?>">All Products</a>
+  <a href="product_page.php?category=Electronics" class="category-btn <?php echo $selectedCategory === 'Electronics' ? 'active' : ''; ?>">Electronics</a>
+  <a href="product_page.php?category=Furniture" class="category-btn <?php echo $selectedCategory === 'Furniture' ? 'active' : ''; ?>">Furniture</a>
+  <a href="product_page.php?category=Food" class="category-btn <?php echo $selectedCategory === 'Food' ? 'active' : ''; ?>">Food</a>
+  <a href="product_page.php?category=Beauty%20and%20Personal%20Care" class="category-btn <?php echo $selectedCategory === 'Beauty and Personal Care' ? 'active' : ''; ?>">Beauty & Personal Care</a>
+  <a href="product_page.php?category=Fashion%20and%20Apparel" class="category-btn <?php echo $selectedCategory === 'Fashion and Apparel' ? 'active' : ''; ?>">Fashion & Apparel</a>
+  <a href="product_page.php?category=Toy%20and%20Hobbies" class="category-btn <?php echo $selectedCategory === 'Toy and Hobbies' ? 'active' : ''; ?>">Toys & Hobbies</a>
+</div>
+
+<!-- Search Bar -->
+<div class="search-bar">
+  <form method="GET" action="product_page.php">
+    <input type="text" name="search" placeholder="Search products..." value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+    <?php if ($selectedCategory): ?>
+      <input type="hidden" name="category" value="<?php echo htmlspecialchars($selectedCategory); ?>">
+    <?php endif; ?>
+    <button type="submit">Search</button>
+  </form>
+</div>
+
 <section class="product-grid">
   <div style="width:100%;padding:20px 10%;">
-    <h2 style="margin:0;padding:0;"><?php echo $selectedCategory !== '' ? htmlspecialchars($selectedCategory) : 'All Products'; ?></h2>
+    <h2 style="margin:0;padding:0;">
+      <?php 
+        if ($searchTerm !== '' && $selectedCategory !== '') {
+          echo "Search results for \"" . htmlspecialchars($searchTerm) . "\" in " . htmlspecialchars($selectedCategory);
+        } elseif ($searchTerm !== '') {
+          echo "Search results for \"" . htmlspecialchars($searchTerm) . "\"";
+        } elseif ($selectedCategory !== '') {
+          echo htmlspecialchars($selectedCategory);
+        } else {
+          echo 'All Products';
+        }
+        echo " ($totalItems items found)";
+      ?>
+    </h2>
   </div>
   
   <?php
     // Get paginated products
-  $productsQuery .= " LIMIT ? OFFSET ?";
+  $productsQuery .= " ORDER BY Added_On DESC LIMIT ? OFFSET ?";
   $stmt = $conn->prepare($productsQuery);
-  if ($selectedCategory !== '') {
-      $stmt->bind_param("sii", $categoryParam, $itemsPerPage, $offset);
-  } else {
-      $stmt->bind_param("ii", $itemsPerPage, $offset);
+  
+  // Add pagination parameters
+  $paginationParams = $params;
+  $paginationParams[] = $itemsPerPage;
+  $paginationParams[] = $offset;
+  $paginationParamTypes = $paramTypes . 'ii';
+  
+  if (!empty($paginationParams)) {
+      $stmt->bind_param($paginationParamTypes, ...$paginationParams);
   }
+  
   $stmt->execute();
-  $paginatedProducts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);      // Fetch as associative array is wrongly placed as cannot be updated when adding new products
+  $paginatedProducts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+  
+  if (empty($paginatedProducts)): ?>
+    <div style="text-align: center; padding: 60px 20px; grid-column: 1 / -1;">
+      <h3 style="color: #666; margin-bottom: 20px;">No products found</h3>
+      <p style="color: #999; margin-bottom: 20px;">
+        <?php if ($searchTerm !== '' || $selectedCategory !== ''): ?>
+          Try adjusting your search criteria or browse all products.
+        <?php else: ?>
+          No products have been uploaded yet. Be the first to <a href="upload_item.php" style="color: #00695c;">upload an item</a>!
+        <?php endif; ?>
+      </p>
+      <?php if ($searchTerm !== '' || $selectedCategory !== ''): ?>
+        <a href="product_page.php" style="background: #00695c; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">View All Products</a>
+      <?php endif; ?>
+    </div>
+  <?php endif; ?>
  
-  foreach ($paginatedProducts as $p): ?>
+  <?php foreach ($paginatedProducts as $p): 
+    $imagePath = "images/products/" . htmlspecialchars($p['Item_ID']) . ".jpg";
+    if (!file_exists($imagePath)) {
+      $imagePath = "images/products/default.jpg";
+    }
+  ?>
     <div class="product-card">
-      <img src="images/products/<?= htmlspecialchars($p['Item_ID']) ?>.jpg" alt="<?= htmlspecialchars($p['Item_Name']) ?>">
+      <img src="<?= $imagePath ?>" alt="<?= htmlspecialchars($p['Item_Name']) ?>" onerror="this.src='images/products/default.jpg'">
       <h3><?= htmlspecialchars($p['Item_Name']) ?></h3>
       <p><?= htmlspecialchars($p['Item_Description']) ?></p>
       <p><small>Sold by: <?= htmlspecialchars($p['seller_name']) ?></small></p>
@@ -192,14 +300,21 @@ $totalPages = $totalItems > 0 ? ceil($totalItems / $itemsPerPage) : 1;
 </section>
 
 <div class="pagination">
+  <?php 
+  // Build query string for pagination
+  $queryParams = [];
+  if ($selectedCategory !== '') $queryParams['category'] = $selectedCategory;
+  if ($searchTerm !== '') $queryParams['search'] = $searchTerm;
+  $queryString = !empty($queryParams) ? '&' . http_build_query($queryParams) : '';
+  ?>
   <?php if ($page > 1): ?>
-    <a href="?page=<?= $page - 1 ?>">&laquo; Prev</a>
+    <a href="?page=<?= $page - 1 ?><?= $queryString ?>">&laquo; Prev</a>
   <?php endif; ?>
   <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-    <a href="?page=<?= $i ?>" class="<?= $i == $page ? 'active' : '' ?>"><?= $i ?></a>
+    <a href="?page=<?= $i ?><?= $queryString ?>" class="<?= $i == $page ? 'active' : '' ?>"><?= $i ?></a>
   <?php endfor; ?>
   <?php if ($page < $totalPages): ?>
-    <a href="?page=<?= $page + 1 ?>">Next &raquo;</a>
+    <a href="?page=<?= $page + 1 ?><?= $queryString ?>">Next &raquo;</a>
   <?php endif; ?>
 </div>
 

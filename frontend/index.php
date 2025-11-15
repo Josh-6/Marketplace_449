@@ -121,7 +121,7 @@ session_start();
     <h2>Featured Products</h2>
     <div class="product-grid" id="product-grid">
       <?php
-      $query = "SELECT Item_ID, Item_Name, Item_Price, Item_Description,Seller_ID, Item_Quantity FROM Marketplace.Item LIMIT 6";
+      $query = "SELECT Item_ID, Item_Name, Item_Price, Item_Description,Seller_ID, Item_Quantity FROM Marketplace.Item LIMIT 4";
       $result = mysqli_query($conn, $query);
       foreach ($result as $p): ?>
         <div class="product-card">
@@ -161,7 +161,7 @@ session_start();
     <div class="product-grid" id="product-grid">
       <!-- Products will be loaded here In the mean time later on we can use js to load more products-->
       <?php
-      $query = "SELECT * FROM Marketplace.new_products LIMIT 10";
+      $query = "SELECT Item_ID, Item_Name, Item_Price, Item_Description, Seller_ID, Item_Quantity FROM Marketplace.Item ORDER BY Added_On DESC LIMIT 4";
       $result = mysqli_query($conn, $query);
       foreach ($result as $p): ?>
         <div class="product-card">
