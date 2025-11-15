@@ -121,12 +121,37 @@ session_start();
     <h2>Featured Products</h2>
     <div class="product-grid" id="product-grid">
       <?php
-      $query = "SELECT Item_ID, Item_Name, Item_Price, Item_Description,Seller_ID, Item_Quantity FROM Marketplace.Item LIMIT 6";
+      // Featured products with ratings
+      $query = "SELECT i.Item_ID, i.Item_Name, i.Item_Price, i.Item_Description, i.Seller_ID, i.Item_Quantity,
+                       AVG(r.Review_Rating) as avg_rating, COUNT(r.Review_ID) as review_count
+                FROM Marketplace.Item i 
+                LEFT JOIN Marketplace.Review r ON i.Item_ID = r.Item_ID
+                GROUP BY i.Item_ID 
+                LIMIT 4";
       $result = mysqli_query($conn, $query);
       foreach ($result as $p): ?>
         <div class="product-card">
-          <img src="images/products/<?= htmlspecialchars($p['Item_ID']) ?>.jpg" alt="<?= htmlspecialchars($p['Item_Name']) ?>">
-          <h3><?= htmlspecialchars($p['Item_Name']) ?></h3>
+          <a href="product_detail.php?id=<?= htmlspecialchars($p['Item_ID']) ?>" style="text-decoration:none;color:inherit;">
+            <img src="images/products/<?= htmlspecialchars($p['Item_ID']) ?>.jpg" alt="<?= htmlspecialchars($p['Item_Name']) ?>">
+            <h3><?= htmlspecialchars($p['Item_Name']) ?></h3>
+            <div class="product-rating" style="margin: 8px 0; display: flex; align-items: center; gap: 5px;">
+              <div class="stars" style="display: flex; gap: 1px;">
+                <?php 
+                $rating = $p['avg_rating'] ? round($p['avg_rating'], 1) : 0;
+                for ($i = 1; $i <= 5; $i++) {
+                  if ($i <= floor($rating)) {
+                    echo '<span style="color: #ffd700; font-size: 0.9rem;">★</span>';
+                  } else {
+                    echo '<span style="color: #ddd; font-size: 0.9rem;">★</span>';
+                  }
+                }
+                ?>
+              </div>
+              <span style="font-size: 0.8rem; color: #666;">
+                <?= $p['review_count'] ? '(' . $p['review_count'] . ')' : '(0)' ?>
+              </span>
+            </div>
+          </a>
           <p><?= htmlspecialchars($p['Item_Description']) ?></p>
           <div class="price">$<?= htmlspecialchars(number_format($p['Item_Price'], 2)) ?></div>
 
@@ -161,12 +186,37 @@ session_start();
     <div class="product-grid" id="product-grid">
       <!-- Products will be loaded here In the mean time later on we can use js to load more products-->
       <?php
-      $query = "SELECT * FROM Marketplace.new_products LIMIT 10";
+      // New products with ratings
+      $query = "SELECT i.Item_ID, i.Item_Name, i.Item_Price, i.Item_Description, i.Seller_ID, i.Item_Quantity,
+                       AVG(r.Review_Rating) as avg_rating, COUNT(r.Review_ID) as review_count
+                FROM Marketplace.Item i 
+                LEFT JOIN Marketplace.Review r ON i.Item_ID = r.Item_ID
+                GROUP BY i.Item_ID 
+                ORDER BY i.Added_On DESC LIMIT 4";
       $result = mysqli_query($conn, $query);
       foreach ($result as $p): ?>
         <div class="product-card">
-          <img src="images/products/<?= htmlspecialchars($p['Item_ID']) ?>.jpg" alt="<?= htmlspecialchars($p['Item_Name']) ?>">
-          <h3><?= htmlspecialchars($p['Item_Name']) ?></h3>
+          <a href="product_detail.php?id=<?= htmlspecialchars($p['Item_ID']) ?>" style="text-decoration:none;color:inherit;">
+            <img src="images/products/<?= htmlspecialchars($p['Item_ID']) ?>.jpg" alt="<?= htmlspecialchars($p['Item_Name']) ?>">
+            <h3><?= htmlspecialchars($p['Item_Name']) ?></h3>
+            <div class="product-rating" style="margin: 8px 0; display: flex; align-items: center; gap: 5px;">
+              <div class="stars" style="display: flex; gap: 1px;">
+                <?php 
+                $rating = $p['avg_rating'] ? round($p['avg_rating'], 1) : 0;
+                for ($i = 1; $i <= 5; $i++) {
+                  if ($i <= floor($rating)) {
+                    echo '<span style="color: #ffd700; font-size: 0.9rem;">★</span>';
+                  } else {
+                    echo '<span style="color: #ddd; font-size: 0.9rem;">★</span>';
+                  }
+                }
+                ?>
+              </div>
+              <span style="font-size: 0.8rem; color: #666;">
+                <?= $p['review_count'] ? '(' . $p['review_count'] . ')' : '(0)' ?>
+              </span>
+            </div>
+          </a>
           <p><?= htmlspecialchars($p['Item_Description']) ?></p>
           <div class="price">$<?= htmlspecialchars(number_format($p['Item_Price'], 2)) ?></div>
 
