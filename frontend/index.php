@@ -247,6 +247,22 @@ session_start();
     </div>
   </section>
 
+<!-- Chatbot Section -->
+    <section class="chatbot-section">
+        <h2>AI Assistant</h2>
+        <p>Chat with our AI-powered assistant for product recommendations and inquiries.</p>
+        <div class="chatbot-container">
+            <div class="chatbot-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <p>Hello! I'm your AI assistant. How can I help you today?</p>
+                </div>
+            </div>
+            <form id="chatForm" class="chatbot-form">
+                <input type="text" id="chatInput" placeholder="Type your message..." required>
+                    <button type="submit">Send</button>
+            </form>
+        </div>
+    </section>
 
   <!-- Footer -->
   <footer>
@@ -279,6 +295,75 @@ session_start();
   <!-- JS file -->
   <script src="js/app.js"></script>
   <script src="js/index.js"></script>
+  
+  <!-- Chatbot Script -->
+  <script>
+    document.getElementById('chatForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const input = document.getElementById('chatInput');
+      const message = input.value.trim();
+      
+      if (!message) return;
+      
+      // Add user message to chat
+      const messagesContainer = document.getElementById('chatMessages');
+      const userMessageDiv = document.createElement('div');
+      userMessageDiv.className = 'message user-message';
+      userMessageDiv.innerHTML = `<p>${escapeHtml(message)}</p>`;
+      messagesContainer.appendChild(userMessageDiv);
+      
+      // Clear input
+      input.value = '';
+      input.focus();
+      
+      // Scroll to bottom
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      
+      // Send to backend
+      try {
+        const response = await fetch('../backend/chatbot.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ prompt: message })
+        });
+        
+        const data = await response.json();
+        
+        // Add bot response
+        const botMessageDiv = document.createElement('div');
+        botMessageDiv.className = 'message bot-message';
+        if (data.response) {
+          botMessageDiv.innerHTML = `<p>${escapeHtml(data.response)}</p>`;
+        } else {
+          botMessageDiv.innerHTML = `<p style="color: red;">Error: ${escapeHtml(data.error || 'Unknown error')}</p>`;
+        }
+        messagesContainer.appendChild(botMessageDiv);
+        
+        // Scroll to bottom
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      } catch (error) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'message bot-message';
+        errorDiv.innerHTML = `<p style="color: red;">Error: ${escapeHtml(error.message)}</p>`;
+        messagesContainer.appendChild(errorDiv);
+      }
+    });
+    
+    // Helper function to escape HTML
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, m => map[m]);
+    }
+  </script>
 </body>
 
 </html>

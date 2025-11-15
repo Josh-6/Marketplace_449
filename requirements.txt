@@ -1,0 +1,11 @@
+# Use Python 3.x and specify dependencies
+# // install with: pip install -r requirements.txt
+
+# Machine Learning Libraries 
+# can be PyTorch, TensorFlow or Flax
+# Here we use TensorFlow 
+tensorflow == 2.20.0 
+torch == 2.9.1
+
+# Hugging Face Transformers Library
+transformers == 4.57.1
