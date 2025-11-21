@@ -106,3 +106,112 @@ create table IF NOT EXISTS Marketplace.Review(
     FOREIGN KEY (Item_ID) REFERENCES Marketplace.Item(Item_ID) ON DELETE CASCADE
 );
 
+/*
+-- Will hold individual instances of items
+CREATE TABLE IF NOT EXISTS Marketplace.Item_Instance (
+    Product_ID INT PRIMARY KEY AUTO_INCREMENT,
+    Item_ID INT NOT NULL,
+    Seller_ID INT NOT NULL,
+    Item_Name VARCHAR(30) NOT NULL,
+    Item_Description VARCHAR(100) NOT NULL,
+    Item_Price FLOAT NOT NULL,
+    Item_Tags VARCHAR(45),
+    Added_On DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (Item_ID) REFERENCES Marketplace.Item(Item_ID) ON DELETE CASCADE,
+    FOREIGN KEY (Seller_ID) REFERENCES Marketplace.Seller(Seller_ID) ON DELETE CASCADE
+);
+
+-- How we delete items when user buys an item
+-- DELETE FROM Marketplace.Item_Instance
+-- WHERE Item_ID = 42 --$item['id']
+-- LIMIT 1; -- $item['quantity']
+
+
+-- Delimiter just means ';' does not end the statement
+-- Will automatically create instances of an item depending on quantity
+-- when inserting an item into Item table
+DELIMITER $$
+
+CREATE TRIGGER trg_item_after_insert
+AFTER INSERT ON Marketplace.Item
+FOR EACH ROW
+BEGIN
+    DECLARE counter INT DEFAULT 0;
+
+    WHILE counter < NEW.Item_Quantity DO
+        INSERT INTO Marketplace.Item_Instance (
+            Item_ID, 
+            Seller_ID, 
+            Item_Name, 
+            Item_Description, 
+            Item_Price, 
+            Item_Tags, 
+            Added_On
+        )
+        VALUES (
+            NEW.Item_ID,
+            NEW.Seller_ID,
+            NEW.Item_Name,
+            NEW.Item_Description,
+            NEW.Item_Price,
+            NEW.Item_Tags,
+            NEW.Added_On
+        );
+
+        SET counter = counter + 1;
+    END WHILE;
+END$$
+
+DELIMITER ;
+
+-- Will automaitcally add instances if user adds more quantity
+DELIMITER $$
+
+CREATE TRIGGER trg_item_after_update
+AFTER UPDATE ON Marketplace.Item
+FOR EACH ROW
+BEGIN
+    DECLARE existing_count INT;
+    DECLARE to_add INT;
+    DECLARE i INT DEFAULT 0;
+
+    -- Count existing instances
+    SELECT COUNT(*)
+    INTO existing_count
+    FROM Marketplace.Item_Instance
+    WHERE Item_ID = NEW.Item_ID;
+
+    -- How many additional instances needed
+    SET to_add = NEW.Item_Quantity - existing_count;
+
+    IF to_add > 0 THEN
+        WHILE i < to_add DO
+            INSERT INTO Marketplace.Item_Instance (
+                Item_ID, 
+                Seller_ID, 
+                Item_Name, 
+                Item_Description, 
+                Item_Price, 
+                Item_Tags, 
+                Added_On
+            )
+            VALUES (
+                NEW.Item_ID,
+                NEW.Seller_ID,
+                NEW.Item_Name,
+                NEW.Item_Description,
+                NEW.Item_Price,
+                NEW.Item_Tags,
+                NEW.Added_On
+            );
+
+            SET i = i + 1;
+        END WHILE;
+    END IF;
+
+END$$
+
+DELIMITER ;
+
+*/
