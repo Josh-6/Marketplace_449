@@ -27,31 +27,27 @@ Only need to install these components:
   - Then install the dependencies
 - use pip install or any other method to install them.
 
-4. Open XAMPP Control Panel
-- Start Apache (For viewing in browser)
-- Start MySQL (For connecting to database)
-
-5. Find htdocs in XAMPP folder
+4. Find htdocs in XAMPP folder
 - Windows → C:\xampp\htdocs\
 - Mac → /Applications/XAMPP/htdocs/
 - Linux → /opt/lampp/htdocs/
   
-6. Move or copy Marketplace_449 to htdocs
+5. Move or copy Marketplace_449 to htdocs
 - Windows → C:\xampp\htdocs\Marketplace_449
 - Mac → /Applications/XAMPP/htdocs/Marketplace_449
 - Linux → /opt/lampp/htdocs/Marketplace_449
 
-7. Using XAMPP App
+6. Using XAMPP App
 - start the "Apache" module
 - start the "MySQL" Module
 
-8. Using any mySQL DBMS
+7. Using any mySQL DBMS
 - create a connection
 - copy the XAMPP port and add it on the set up option "Port"
 - set a password if needed
 - Optional - set a devide as a server so that it can be accessible by different collaborators. Needs to have further configuration...
 
-9. Go to your browser and visit
+8. Go to your browser and visit
 - (only the first time)
   ```bash
   http://localhost/marketplace_449/database/
