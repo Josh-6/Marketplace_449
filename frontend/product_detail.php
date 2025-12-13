@@ -18,6 +18,23 @@ if ($product_id <= 0) {
     exit();
 }
 
+
+// Add product to user view histroy
+$userId = $_SESSION['user_id'] ?? 0;
+if ($userId && $product_id) {
+  
+    $stmt = $conn->prepare("
+            INSERT INTO Marketplace.User_History 
+            (User_ID, Item_ID, History_Type, Purchased_At)
+            VALUES (?, ?, 'view', NOW())
+        ");
+    $stmt->bind_param("ii", $userId, $product_id);
+    $stmt->execute();
+
+    echo "<script>console.log('Viewed Item ID $product_id  for User ID $userId');</script>";
+    $stmt->close();
+}
+
 // Fetch product details
 $stmt = $conn->prepare("SELECT i.*, u.Username as seller_name, u.User_Email as seller_email 
                        FROM Marketplace.Item i 
