@@ -17,7 +17,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-echo "Connected successfully";
+echo "\nConnected successfully";
 
 // views created...
 
@@ -25,7 +25,7 @@ echo "Connected successfully";
 $sql = "CREATE VIEW New_Products AS
 SELECT *
 FROM Marketplace.Item
-WHERE Added_On >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 7 DAY);" 
+WHERE Added_On >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 7 DAY);"; 
 
 // Featured products ...
 // $sql =  
