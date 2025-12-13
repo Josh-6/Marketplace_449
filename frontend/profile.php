@@ -169,7 +169,7 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
             <?php if ($itemCount): ?>
                 <?php foreach ($itemHistory as $item): ?>
                     <div class="product-card">
-                        <img src="images/placeholder.png" alt="<?= htmlspecialchars($item['Item_Name']) ?>">
+                        <img src="images/products/6.jpg" alt="<?= htmlspecialchars($item['Item_Name']) ?>">
                         <h3><?= htmlspecialchars($item['Item_Name']) ?></h3>
                         <p><?= htmlspecialchars($item['Item_Description']) ?></p>
                         <div class="price">$<?= htmlspecialchars($item['Item_Price']) ?></div>
