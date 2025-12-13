@@ -102,7 +102,7 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
         <ul>
             <li><a href="index.php">Home</a></li>
             <li><a href="product_page.php">Products</a></li>
-            <li><a href="#">Categories</a></li>
+            <!-- <li><a href="#">Categories</a></li> -->
             <li><a href="upload_item.php">Sell Item</a></li>
             <li><a href="#">About</a></li>
             <li><a href="#">Contact Us</a></li>
@@ -111,8 +111,8 @@ $paginatedProducts = array_slice($productsToShow, $start, $itemsPerPage);
                     <a href="#">Hello, <?php echo htmlspecialchars($_SESSION['username']); ?></a>
                     <div class="dropdown-menu">
                         <a href="profile.php">Profile</a>
-                        <a href="#">History</a>
-                        <a href="#">Orders</a>
+                        <a href="profile.php">History</a>
+                        <a href="profile.php">Orders</a>
                         <a href="../backend/logout.php">Sign Out</a>
                     </div>
                 <?php else: ?>

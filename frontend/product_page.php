@@ -172,8 +172,8 @@ $totalPages = $totalItems > 0 ? ceil($totalItems / $itemsPerPage) : 1;
             <a href="#">Hello, <?php echo htmlspecialchars($_SESSION['username']); ?></a>
             <div class="dropdown-menu">
               <a href="profile.php">Profile</a>
-              <a href="#">History</a>
-              <a href="#">Orders</a>
+              <a href="profile.php">History</a>
+              <a href="profile.php">Orders</a>
                   <a href="../backend/logout.php">Sign Out</a>
             </div>
           <?php else: ?>
