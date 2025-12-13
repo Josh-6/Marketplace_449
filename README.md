@@ -11,14 +11,22 @@ An online marketplace where individuals can browse, search, and purchase a varie
   https://github.com/Josh-6/Marketplace_449.git
   ```
 2. Install XAMPP
-  ```bash
+   
+  - go to
+```bash
   https://www.apachefriends.org/
   ```
-Only need to install these components:
-- Apache
-- MySQL
-- PHP
-- phpMyAdmin
+  Only need to install these components:
+  - Apache
+  - MySQL
+  - PHP
+  - phpMyAdmin
+
+  Go to XAMPP file location 
+  By default it is located in:
+  `C:\xampp`
+  Put the application files in the htdocs folder
+
 
 3. Open install the libraries inside requirements.txt
 - Optional but recomended: use a virtual environment to install the libraries and its dependencies to avoid error or clogging your pc.
