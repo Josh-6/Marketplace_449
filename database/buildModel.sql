@@ -70,8 +70,8 @@ CREATE TABLE IF not EXISTS Marketplace.User_History (
     Item_ID int not null,
     History_Type ENUM('view', 'purchase') not null DEFAULT 'view',
     Quantity int DEFAULT null,  -- used for purchases, null for views
-    Viewed_At DATETIME DEFAULT null,
-    Purchased_At DATETIME DEFAULT null,
+    Viewed_At datetime not null,
+    Purchased_At datetime not null,
     FOREIGN KEY (User_ID) REFERENCES Marketplace.Users(User_ID) ON DELETE CASCADE,
     FOREIGN KEY (Item_ID) REFERENCES Marketplace.Item(Item_ID) ON DELETE CASCADE
 );
@@ -106,23 +106,20 @@ create table IF not EXISTS Marketplace.Review(
     FOREIGN KEY (Item_ID) REFERENCES Marketplace.Item(Item_ID) ON DELETE CASCADE
 );
 
-/*
+
 create table IF not EXISTS Marketplace.Orders(
     Order_ID int primary key auto_increment,
-    Instance_ID int not null,
-    Seller_ID int not null, 
-    Buyer_ID int not null,
-    Item_Name int varchar(30) not null,
+    Instance_ID int,
+    Seller_ID int, 
+    Buyer_ID int,
+    Item_Name varchar(30) not null,
     Item_Description varchar(100) not null,
     Item_Price float not null,
     Item_Tags varchar(45),
-    Order_Placed DATETIME not null DEFAULT CURRENT_TIMESTMP,
-    FOREIGN KEY (Instance_ID) REFRENCES Markeplace.Item_Instance(Instance_ID)
-    FOREIGN KEY (Seller_ID) REFRENCES Markeplace.Item_Instance(Seller_ID)
-    FOREIGN KEY (Buyer_ID) REFRENCES Markeplace.Item_Instance(Buyer_ID)
-)
+    Order_Placed datetime not null
+);
 
---------------
+
 
 -- Will hold individual instances of items
 create table IF not EXISTS Marketplace.Item_Instance(
@@ -133,22 +130,22 @@ create table IF not EXISTS Marketplace.Item_Instance(
     Item_Description varchar(100) not null,
     Item_Price float not null,
     Item_Tags varchar(45),
-    Added_On DATETIME not null DEFAULT CURRENT_TIMESTAMP,
+    Added_On datetime not null,
     
     FOREIGN KEY (Item_ID) REFERENCES Marketplace.Item(Item_ID) ON DELETE CASCADE,
     FOREIGN KEY (Seller_ID) REFERENCES Marketplace.Seller(Seller_ID) ON DELETE CASCADE
 );
 
--- How we delete items when user buys an item
--- DELETE FROM Marketplace.Item_Instance
--- WHERE Item_ID = 42 --$item['id']
--- LIMIT 1; -- $item['quantity']
+
+--  How we delete items when user buys an item
+--  DELETE FROM Marketplace.Item_Instance
+--  WHERE Item_ID = 42  $item[id]
+--  LIMIT 1 $item['quantity]
 
 
--- Delimiter just means ';' does not end the statement
--- Will automatically create instances of an item depending on quantity
--- when inserting an item into Item table
-DELIMITER $$
+--  Will automatically create instances of an item depending on quantity
+--  when inserting an item into Item table
+
 
 CREATE TRIGGER trg_item_after_insert
 AFTER INSERT ON Marketplace.Item
@@ -178,12 +175,10 @@ BEGIN
 
         SET counter = counter + 1;
     END WHILE;
-END$$
+END;
 
-DELIMITER ;
 
 -- Will automaitcally add instances if user adds more quantity
-DELIMITER $$
 
 CREATE TRIGGER trg_item_after_update
 AFTER UPDATE ON Marketplace.Item
@@ -226,8 +221,5 @@ BEGIN
             SET i = i + 1;
         END WHILE;
     END IF;
+END;
 
-END$$
-
-DELIMITER ;
-*/

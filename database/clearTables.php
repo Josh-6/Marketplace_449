@@ -10,7 +10,8 @@
         die("Connection failed: " . $conn->connect_error);
     }
 
-    $query = "drop tables IF EXISTS Review, Payment_Method, Payment,User_History, Item, Seller, Cart, Buyer, Users, Customer_Support;";
+    $query = "drop tables IF EXISTS Review, Payment_Method, Payment, User_History, Item, Seller, Cart, Buyer, Users, 
+                Customer_Support, Orders, Item_Instance;";
 
     $queryStatus = mysqli_query($conn, $query);
     if (!$queryStatus) {

@@ -16,14 +16,16 @@ if ($conn->connect_error) {
 $query = file_get_contents(__DIR__ . '/buildModel.sql');
 $queries = explode(";", $query);
 
-foreach ($queries as $q) {
-    if (trim($q) != '') {
-        $result = mysqli_query($conn, $q);
-        if (!$result) {
-            die("Error executing query: " . mysqli_error($conn));
-        }
-    }
+if (!mysqli_multi_query($conn, $query)) {
+    die("Error executing SQL file: " . mysqli_error($conn));
 }
+
+do {
+    if ($result = mysqli_store_result($conn)) {
+        mysqli_free_result($result);
+    }
+} while (mysqli_next_result($conn));
+
 echo "Database and tables created successfully";
 
 // Close connection
