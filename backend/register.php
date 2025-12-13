@@ -62,7 +62,7 @@ $stmt->bind_param('sss', $username, $email, $password_hash);
 if ($stmt->execute()) {
     $stmt->close();
     $conn->close();
-    header('Location: index.php?registered=1');
+    header('Location: ../frontend/index.php');
     exit;
 } else {
     // Duplicate username or other error

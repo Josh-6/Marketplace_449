@@ -68,7 +68,6 @@ session_start();
       <?php else: ?>
         <h1>Exclusive Deals</h1>
         <p>Explore different categories. Find the best deals.</p>
-        <button>Shop Now</button>
       <?php endif; ?>
     </div>
     <img src="images/hero_image.jpg" alt="Hero Image">
@@ -258,8 +257,8 @@ session_start();
                 </div>
             </div>
             <form id="chatForm" class="chatbot-form">
-                <input type="text" id="chatInput" placeholder="Type your message..." required>
-                    <button type="submit">Send</button>
+              <input type="text" id="chatInput" placeholder="Type your message..." required>
+                <button type="submit" id="chatSendBtn">Send</button>
             </form>
         </div>
     </section>
@@ -320,7 +319,15 @@ session_start();
       // Scroll to bottom
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
       
-      // Send to backend
+      // Send to backend (disable input/button while waiting)
+      const sendBtn = document.getElementById('chatSendBtn');
+      const inputEl = document.getElementById('chatInput');
+      // prevent duplicate sends
+      sendBtn.disabled = true;
+      sendBtn.setAttribute('aria-busy', 'true');
+      inputEl.disabled = true;
+      const prevBtnText = sendBtn.textContent;
+      sendBtn.textContent = 'Sending...';
       try {
         const response = await fetch('../backend/chatbot.php', {
           method: 'POST',
@@ -329,9 +336,9 @@ session_start();
           },
           body: JSON.stringify({ prompt: message })
         });
-        
+
         const data = await response.json();
-        
+
         // Add bot response
         const botMessageDiv = document.createElement('div');
         botMessageDiv.className = 'message bot-message';
@@ -341,7 +348,7 @@ session_start();
           botMessageDiv.innerHTML = `<p style="color: red;">Error: ${escapeHtml(data.error || 'Unknown error')}</p>`;
         }
         messagesContainer.appendChild(botMessageDiv);
-        
+
         // Scroll to bottom
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
       } catch (error) {
@@ -349,6 +356,13 @@ session_start();
         errorDiv.className = 'message bot-message';
         errorDiv.innerHTML = `<p style="color: red;">Error: ${escapeHtml(error.message)}</p>`;
         messagesContainer.appendChild(errorDiv);
+      } finally {
+        // Re-enable input and button
+        sendBtn.disabled = false;
+        sendBtn.removeAttribute('aria-busy');
+        inputEl.disabled = false;
+        sendBtn.textContent = prevBtnText;
+        inputEl.focus();
       }
     });
     
