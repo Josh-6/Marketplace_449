@@ -60,9 +60,13 @@ $password_hash = password_hash($password, PASSWORD_DEFAULT);
 $stmt->bind_param('sss', $username, $email, $password_hash);
 
 if ($stmt->execute()) {
+    session_start();
+
+    $_SESSION['user_id'] = $stmt->insert_id;
+    $_SESSION['username'] = $username;
     $stmt->close();
     $conn->close();
-    header('Location: index.php?registered=1');
+    header('Location: ../frontend/index.php');
     exit;
 } else {
     // Duplicate username or other error

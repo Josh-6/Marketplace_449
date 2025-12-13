@@ -128,13 +128,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 const input = document.querySelector('.input-username');
                 if (!input) return;
                 const newValue = input.value.trim() || 'No Username';
-                // TODO: validate uniqueness on server later
-                // For now, update DOM and log the change
                 document.querySelector('.username-value').textContent = newValue;
                 window.profileSession.username = newValue;
                 hideEditForm('username');
                 //console.log('USERNAME SAVE (client-side only):', newValue);
-                // Future: POST to server endpoint to update
             }
 
             if (target === 'contact') {
